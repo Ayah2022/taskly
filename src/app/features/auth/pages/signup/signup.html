@@ -1,0 +1,299 @@
+<div
+  class="min-h-screen bg-background px-5 py-8 text-slate-dark sm:px-8 sm:py-10 lg:px-12 lg:py-12"
+>
+  <header class="mx-auto w-full">
+    <a routerLink="/" class="inline-flex items-center gap-2" aria-label="Taskly home">
+      <span>
+        <img src="images/taskly-logo.svg" alt="taskly logo" />
+      </span>
+
+      <span class="app-name tracking-1 font-bold text-xl">TASKLY</span>
+    </a>
+  </header>
+
+  <main class="mx-auto flex w-full justify-center">
+    <section
+      class="mt-10 w-full md:w-[45%] rounded-xl bg-white p-6 shadow-[0_24px_48px_rgba(4,27,60,0.06)] sm:mt-12 sm:p-10 lg:mt-14 lg:p-12"
+    >
+      <div class="mb-8">
+        <h1
+          class="text-[28px] tracking-3 leading-10 md:text-3xl text-start md:text-center font-semibold tracking-2 text-slate-dark sm:text-[2rem] sm:leading-tight"
+        >
+          Create your workspace
+        </h1>
+
+        <p class="mt-2 text-sm leading-5 text-slate-medium text-start md:text-center">
+          Join the editorial approach to task management.
+        </p>
+      </div>
+
+      <form [formRoot]="signupForm" class="space-y-5">
+        <!-- Full name -->
+        <div>
+          <label
+            for="signup-name"
+            class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
+          >
+            Name
+          </label>
+
+          <input
+            id="signup-name"
+            type="text"
+            autocomplete="name"
+            placeholder="Enter your full name"
+            [formField]="signupForm.name"
+            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+          />
+
+          <p class="mt-1.5 text-[0.6875rem] text-slate-light">3-50 characters, letters only.</p>
+
+          @if ( signupForm.name().touched() && signupForm.name().invalid() ) {
+          <div class="mt-2 space-y-1" role="alert">
+            @for ( error of signupForm.name().errors(); track error.kind ) {
+            <p class="text-xs font-medium text-error">{{ error.message }}</p>
+            }
+          </div>
+          }
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label
+            for="signup-email"
+            class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
+          >
+            Email
+          </label>
+
+          <input
+            id="signup-email"
+            type="email"
+            autocomplete="email"
+            placeholder="yourname@company.com"
+            [formField]="signupForm.email"
+            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+          />
+
+          @if ( signupForm.email().touched() && signupForm.email().invalid() ) {
+          <div class="mt-2 space-y-1" role="alert">
+            @for ( error of signupForm.email().errors(); track error.kind ) {
+            <p class="text-xs font-medium text-error">{{ error.message }}</p>
+            }
+          </div>
+          }
+        </div>
+
+        <!-- Job title -->
+        <div>
+          <label
+            for="signup-job-title"
+            class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
+          >
+            Job title
+            <span class="text-[0.6875rem] text-surface-medium"> (optional) </span>
+          </label>
+
+          <input
+            id="signup-job-title"
+            type="text"
+            autocomplete="organization-title"
+            placeholder="e.g. Project Manager"
+            [formField]="signupForm.jobTitle"
+            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+          />
+        </div>
+
+        <!-- Passwords -->
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label
+              for="signup-password"
+              class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
+            >
+              Password
+            </label>
+
+            <div class="relative">
+              <input
+                id="signup-password"
+                [type]="showPassword() ? 'text' : 'password'"
+                autocomplete="new-password"
+                placeholder="Password"
+                [formField]="signupForm.password"
+                class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+              />
+
+              <button
+                type="button"
+                class="absolute inset-y-0 right-3 my-auto grid size-8 place-items-center"
+                [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                [attr.aria-pressed]="showPassword()"
+                (click)="togglePasswordVisibility()"
+              >
+                <img
+                  [src]="showPassword() ? '/icons/eye-off.svg' : '/icons/eye-on.svg'"
+                  [alt]="showPassword() ? 'Hide password' : 'Show password'"
+                  class="size-5"
+                />
+              </button>
+            </div>
+
+            @if ( signupForm.password().touched() && signupForm.password().invalid() ) {
+            <div class="mt-2 space-y-1" role="alert">
+              @for ( error of signupForm.password().errors(); track error.kind ) {
+              <p class="text-xs font-medium text-error">{{ error.message }}</p>
+              }
+            </div>
+            }
+          </div>
+
+          <div>
+            <label
+              for="signup-confirm-password"
+              class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
+            >
+              Confirm password
+            </label>
+
+            <div class="relative">
+              <input
+                id="signup-confirm-password"
+                [type]="
+                  showConfirmPassword() ? 'text' : 'password'
+                "
+                autocomplete="new-password"
+                placeholder="Repeat your password"
+                [formField]="signupForm.confirmPassword"
+                class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+              />
+            </div>
+
+            @if ( signupForm.confirmPassword().touched() && signupForm.confirmPassword().invalid() )
+            {
+            <div class="mt-2 space-y-1" role="alert">
+              @for ( error of signupForm.confirmPassword().errors(); track error.kind ) {
+              <p class="text-xs font-medium text-error">{{ error.message }}</p>
+              }
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Password guidance -->
+        <div class="rounded-md bg-surface-highest px-4 py-3" aria-live="polite">
+          <ul class="space-y-1.5 text-xs text-slate-dark">
+            <li class="flex items-center gap-2">
+              <span
+                class="grid size-3 shrink-0 place-items-center rounded-full border"
+                [class.border-surface-medium]="signupModel().password.length < 8"
+                [class.border-green-dark]="signupModel().password.length >= 8"
+                [class.text-green-dark]="signupModel().password.length >= 8"
+              >
+                @if (signupModel().password.length >= 8) {
+                <span class="flex items-center justify-center text-[9px]">✓</span>
+                }
+              </span>
+              <span class="text-[0.6875rem] text-gray-medium">At least 8 characters</span>
+            </li>
+
+            <li class="flex items-center gap-2">
+              <span
+                class="grid size-3 shrink-0 place-items-center rounded-full border"
+                [class.border-surface-medium]="
+                  !(
+                    /[A-Z]/.test(signupModel().password) &&
+                    /[a-z]/.test(signupModel().password) &&
+                    /\d/.test(signupModel().password)
+                  )
+                "
+                [class.border-green-dark]="
+                  /[A-Z]/.test(signupModel().password) &&
+                  /[a-z]/.test(signupModel().password) &&
+                  /\d/.test(signupModel().password)
+                "
+                [class.text-green-dark]="
+                  /[A-Z]/.test(signupModel().password) &&
+                  /[a-z]/.test(signupModel().password) &&
+                  /\d/.test(signupModel().password)
+                "
+              >
+                @if ( /[A-Z]/.test(signupModel().password) && /[a-z]/.test(signupModel().password)
+                && /\d/.test(signupModel().password) ) {
+                <span class="flex items-center justify-center text-[9px]">✓</span>
+                }
+              </span>
+              <span class="text-[0.6875rem] text-gray-medium"
+                >One uppercase, lowercase, and digit</span
+              >
+            </li>
+
+            <li class="flex items-center gap-2">
+              <span
+                class="grid size-3 shrink-0 place-items-center rounded-full border"
+                [class.border-surface-medium]="
+                  !/[^A-Za-z0-9]/.test(signupModel().password)
+                "
+                [class.border-green-dark]="
+                  /[^A-Za-z0-9]/.test(signupModel().password)
+                "
+                [class.text-green-dark]="
+                  /[^A-Za-z0-9]/.test(signupModel().password)
+                "
+              >
+                @if (/[^A-Za-z0-9]/.test(signupModel().password)) {
+                <span class="flex items-center justify-center text-[9px]">✓</span>
+                }
+              </span>
+              <span class="text-[0.6875rem] text-gray-medium">One special character</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Server error -->
+        @if (signupError()) {
+        <div
+          class="rounded-md border border-error/20 bg-error/10 px-4 py-3 text-sm font-medium text-error"
+          role="alert"
+        >
+          {{ signupError() }}
+        </div>
+        }
+
+        <!-- Success -->
+        @if (signupSuccess()) {
+        <div
+          class="rounded-md border border-success/20 bg-success/10 px-4 py-3 text-sm font-medium text-slate-dark"
+          role="status"
+        >
+          Your account was created successfully.
+        </div>
+        }
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          [disabled]="signupForm().submitting()"
+          class="flex min-h-12 w-full items-center justify-center rounded-md bg-primary-gradient px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          @if (signupForm().submitting()) {
+          <span class="flex items-center gap-2">
+            <span
+              class="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white"
+              aria-hidden="true"
+            ></span>
+            Creating account...
+          </span>
+          } @else { Create Account }
+        </button>
+
+        <p class="text-center text-sm text-slate-medium mt-10">
+          Already have an account?
+          <a routerLink="/auth/login" class="font-semibold text-primary hover:cursor-pointer">
+            Log in
+          </a>
+        </p>
+      </form>
+    </section>
+  </main>
+</div>

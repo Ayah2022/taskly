@@ -1,0 +1,25 @@
+/* Tailwind theme mapping */
+@theme {
+  --font-sans: var(--font-family);
+  --background-image-primary-gradient: var(--primary-gradient);
+  --color-primary: var(--primary);
+  --color-primary-container: var(--primary-container);
+
+  --color-surface-highest: var(--surface-highest);
+  --color-surface-medium: var(--surface-medium);
+  --color-surface-low: var(--surface-low);
+  --color-gray-medium: var(--gray-medium);
+  --color-background: var(--background);
+  --color-green-dark: var(--green-dark);
+  --color-slate-dark: var(--slate-dark);
+  --color-slate-medium: var(--slate-medium);
+  --color-slate-light: var(--slate-light);
+
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+
+  --tracking-1: -0.5px;
+  --tracking-2: -0.75px;
+  --tracking-3: -0.8px;
+}

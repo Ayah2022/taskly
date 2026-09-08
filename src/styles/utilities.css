@@ -1,0 +1,9 @@
+/* global utility styles if needed */
+html,
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-family);
+}
