@@ -155,18 +155,29 @@
             >
               Confirm password
             </label>
-
+            <!--  [type]="showConfirmPassword() ? 'text' : 'password'" -->
             <div class="relative">
               <input
                 id="signup-confirm-password"
-                [type]="
-                  showConfirmPassword() ? 'text' : 'password'
-                "
+                type="password"
                 autocomplete="new-password"
                 placeholder="Repeat your password"
                 [formField]="signupForm.confirmPassword"
                 class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
               />
+              <!-- <button
+                type="button"
+                class="absolute inset-y-0 right-3 my-auto grid size-8 place-items-center"
+                [attr.aria-label]="showConfirmPassword() ? 'Hide password' : 'Show password'"
+                [attr.aria-pressed]="showConfirmPassword()"
+                (click)="toggleConfirmPasswordVisibility()"
+              >
+                <img
+                  [src]="showConfirmPassword() ? '/icons/eye-off.svg' : '/icons/eye-on.svg'"
+                  [alt]="showConfirmPassword() ? 'Hide password' : 'Show password'"
+                  class="size-5"
+                />
+              </button> -->
             </div>
 
             @if ( signupForm.confirmPassword().touched() && signupForm.confirmPassword().invalid() )
@@ -186,11 +197,20 @@
             <li class="flex items-center gap-2">
               <span
                 class="grid size-3 shrink-0 place-items-center rounded-full border"
-                [class.border-surface-medium]="signupModel().password.length < 8"
-                [class.border-green-dark]="signupModel().password.length >= 8"
-                [class.text-green-dark]="signupModel().password.length >= 8"
+                [class.border-surface-medium]="
+                      signupModel().password.length < 8 ||
+                      signupModel().password.length > 64
+                    "
+                [class.border-green-dark]="
+                        signupModel().password.length >= 8 &&
+                        signupModel().password.length <= 64
+                      "
+                [class.text-green-dark]="
+                        signupModel().password.length >= 8 &&
+                        signupModel().password.length <= 64
+                      "
               >
-                @if (signupModel().password.length >= 8) {
+                @if (signupModel().password.length >= 8 && signupModel().password.length <= 64) {
                 <span class="flex items-center justify-center text-[9px]">✓</span>
                 }
               </span>
@@ -228,20 +248,41 @@
               >
             </li>
 
+            <!-- <li class="flex items-center gap-2">
+              <span
+                class="grid size-3 shrink-0 place-items-center rounded-full border"
+                [class.border-surface-medium]="
+                  /\s/.test(signupModel().password)
+                "
+                [class.border-green-dark]="
+                  !/\s/.test(signupModel().password)
+                "
+                [class.text-green-dark]="
+                  !/\s/.test(signupModel().password)
+                "
+              >
+                @if (signupModel().password && !/\s/.test(signupModel().password)) {
+                <span class="flex items-center justify-center text-[9px]">✓</span>
+                }
+              </span>
+
+              <span class="text-[0.6875rem] text-gray-medium"> No spaces </span>
+            </li> -->
+
             <li class="flex items-center gap-2">
               <span
                 class="grid size-3 shrink-0 place-items-center rounded-full border"
                 [class.border-surface-medium]="
-                  !/[^A-Za-z0-9]/.test(signupModel().password)
+                  !/[!@#$%^&*]/.test(signupModel().password)
                 "
                 [class.border-green-dark]="
-                  /[^A-Za-z0-9]/.test(signupModel().password)
+                  /[!@#$%^&*]/.test(signupModel().password)
                 "
                 [class.text-green-dark]="
-                  /[^A-Za-z0-9]/.test(signupModel().password)
+                  /[!@#$%^&*]/.test(signupModel().password)
                 "
               >
-                @if (/[^A-Za-z0-9]/.test(signupModel().password)) {
+                @if (/[!@#$%^&*]/.test(signupModel().password)) {
                 <span class="flex items-center justify-center text-[9px]">✓</span>
                 }
               </span>
@@ -266,7 +307,7 @@
           class="rounded-md border border-success/20 bg-success/10 px-4 py-3 text-sm font-medium text-slate-dark"
           role="status"
         >
-          Your account was created successfully.
+          Your account was created successfully. Please log in.
         </div>
         }
 
@@ -289,7 +330,7 @@
 
         <p class="text-center text-sm text-slate-medium mt-10">
           Already have an account?
-          <a routerLink="/auth/login" class="font-semibold text-primary hover:cursor-pointer">
+          <a routerLink="/login" class="font-semibold text-primary hover:cursor-pointer">
             Log in
           </a>
         </p>
