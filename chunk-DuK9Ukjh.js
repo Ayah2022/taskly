@@ -1,1 +1,0 @@
-var t=[{path:``,loadComponent:()=>import(`./chunk-CdsgB5OD.js`).then(o=>o.Projects)}];export{t as PROJECTS_ROUTES};

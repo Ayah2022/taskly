@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-4RRMjlSI.js`).then(o=>o.Projects)}];export{t as PROJECTS_ROUTES};

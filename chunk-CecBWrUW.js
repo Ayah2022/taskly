@@ -1,1 +1,0 @@
-import{B as dd,F as _m,H as fd,_ as Iy}from"./main-SVCYOE7X.js";var s=class e{static ɵfac=function(t){return new(t||e)};static ɵcmp=_m({type:e,selectors:[[`app-layout`]],decls:2,vars:0,template:function(t,m){t&1&&(dd(0,`p`),Iy(1,`layout works!`),fd())},encapsulation:2})};export{s as Layout};

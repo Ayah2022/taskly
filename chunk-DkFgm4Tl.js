@@ -1,1 +1,0 @@
-var t=[{path:`sign-up`,loadComponent:()=>import(`./chunk-B8Q-dz2F.js`).then(o=>o.Signup)},{path:`login`,loadComponent:()=>import(`./chunk-BmMseEAV.js`).then(o=>o.Login)}];export{t as AUTH_ROUTES};
