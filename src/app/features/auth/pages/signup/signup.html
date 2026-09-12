@@ -4,7 +4,7 @@
   <header class="mx-auto w-full">
     <a routerLink="/" class="inline-flex items-center gap-2" aria-label="Taskly home">
       <span>
-        <img src="images/taskly-logo.svg" alt="taskly logo" />
+        <img src="assets/images/taskly-logo.svg" alt="taskly logo" />
       </span>
 
       <span class="app-name tracking-1 font-bold text-xl">TASKLY</span>
@@ -132,7 +132,7 @@
                 (click)="togglePasswordVisibility()"
               >
                 <img
-                  [src]="showPassword() ? '/icons/eye-off.svg' : '/icons/eye-on.svg'"
+                  [src]="showPassword() ? 'assets/icons/eye-off.svg' : 'assets/icons/eye-on.svg'"
                   [alt]="showPassword() ? 'Hide password' : 'Show password'"
                   class="size-5"
                 />
