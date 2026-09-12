@@ -7,3 +7,52 @@ textarea,
 select {
   font-family: var(--font-family);
 }
+
+@layer utilities {
+  .display-lg {
+    font-size: var(--font-size-display-lg);
+    line-height: var(--line-height-display-lg);
+    font-weight: var(--font-weight-display-lg);
+    letter-spacing: var(--letter-spacing-display-lg);
+  }
+
+  .headline-lg {
+    font-size: var(--font-size-headline-lg);
+    line-height: var(--line-height-headline-lg);
+    font-weight: var(--font-weight-headline-lg);
+    letter-spacing: var(--letter-spacing-headline-lg);
+  }
+
+  .title-md {
+    font-size: var(--font-size-title-md);
+    line-height: var(--line-height-title-md);
+    font-weight: var(--font-weight-title-md);
+    letter-spacing: var(--letter-spacing-title-md);
+  }
+
+  .body-md {
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    font-weight: var(--font-weight-body-md);
+    letter-spacing: var(--letter-spacing-body-md);
+  }
+
+  .label-sm {
+    font-size: var(--font-size-label-sm);
+    line-height: var(--line-height-label-sm);
+    font-weight: var(--font-weight-label-sm);
+    letter-spacing: var(--letter-spacing-label-sm);
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 767px) {
+    .display-lg {
+      font-size: var(--font-size-display-lg-mobile);
+      line-height: var(--line-height-display-lg-mobile);
+    }
+    .headline-lg {
+      font-size: var(--font-size-headline-lg-mobile);
+      line-height: var(--line-height-headline-lg-mobile);
+    }
+  }
+}

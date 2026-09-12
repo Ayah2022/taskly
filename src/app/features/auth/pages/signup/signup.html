@@ -16,13 +16,9 @@
       class="mt-10 w-full md:w-[45%] rounded-xl bg-white p-6 shadow-[0_24px_48px_rgba(4,27,60,0.06)] sm:mt-12 sm:p-10 lg:mt-14 lg:p-12"
     >
       <div class="mb-8">
-        <h1
-          class="text-[28px] tracking-3 leading-10 md:text-3xl text-start md:text-center font-semibold tracking-2 text-slate-dark sm:text-[2rem] sm:leading-tight"
-        >
-          Create your workspace
-        </h1>
+        <h1 class="headline-lg text-start md:text-center">Create your workspace</h1>
 
-        <p class="mt-2 text-sm leading-5 text-slate-medium text-start md:text-center">
+        <p class="mt-2 body-md text-slate-medium text-start md:text-center">
           Join the editorial approach to task management.
         </p>
       </div>
@@ -30,12 +26,7 @@
       <form [formRoot]="signupForm" class="space-y-5">
         <!-- Full name -->
         <div>
-          <label
-            for="signup-name"
-            class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
-          >
-            Name
-          </label>
+          <label for="signup-name" class="label-sm block uppercase text-slate-medium"> Name </label>
 
           <input
             id="signup-name"
@@ -59,10 +50,7 @@
 
         <!-- Email -->
         <div>
-          <label
-            for="signup-email"
-            class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
-          >
+          <label for="signup-email" class="label-sm block uppercase text-slate-medium">
             Email
           </label>
 
@@ -86,10 +74,7 @@
 
         <!-- Job title -->
         <div>
-          <label
-            for="signup-job-title"
-            class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
-          >
+          <label for="signup-job-title" class="label-sm block uppercase text-slate-medium">
             Job title
             <span class="text-[0.6875rem] text-surface-medium"> (optional) </span>
           </label>
@@ -107,10 +92,7 @@
         <!-- Passwords -->
         <div class="grid gap-5 sm:grid-cols-2">
           <div>
-            <label
-              for="signup-password"
-              class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
-            >
+            <label for="signup-password" class="label-sm block uppercase text-slate-medium">
               Password
             </label>
 
@@ -149,10 +131,7 @@
           </div>
 
           <div>
-            <label
-              for="signup-confirm-password"
-              class="mb-[8px] block text-[0.6875rem] font-bold uppercase tracking-1 text-slate-medium"
-            >
+            <label for="signup-confirm-password" class="label-sm block uppercase text-slate-medium">
               Confirm password
             </label>
             <!--  [type]="showConfirmPassword() ? 'text' : 'password'" -->
