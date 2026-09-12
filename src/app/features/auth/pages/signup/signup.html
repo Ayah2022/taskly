@@ -195,52 +195,23 @@
         <div class="rounded-md bg-surface-highest px-4 py-3" aria-live="polite">
           <ul class="space-y-1.5 text-xs text-slate-dark">
             <li class="flex items-center gap-2">
-              <span
-                class="grid size-3 shrink-0 place-items-center rounded-full border"
-                [class.border-surface-medium]="
-                      signupModel().password.length < 8 ||
-                      signupModel().password.length > 64
-                    "
-                [class.border-green-dark]="
-                        signupModel().password.length >= 8 &&
-                        signupModel().password.length <= 64
-                      "
-                [class.text-green-dark]="
-                        signupModel().password.length >= 8 &&
-                        signupModel().password.length <= 64
-                      "
-              >
+              <span class="grid size-3 shrink-0 place-items-center">
                 @if (signupModel().password.length >= 8 && signupModel().password.length <= 64) {
-                <span class="flex items-center justify-center text-[9px]">✓</span>
+                <img src="assets/icons/ticked-icon.svg" class="size-3" alt="Valid" />
+                } @else {
+                <img src="assets/icons/circle-icon.svg" class="size-3" alt="Invalid" />
                 }
               </span>
               <span class="text-[0.6875rem] text-gray-medium">At least 8 characters</span>
             </li>
 
             <li class="flex items-center gap-2">
-              <span
-                class="grid size-3 shrink-0 place-items-center rounded-full border"
-                [class.border-surface-medium]="
-                  !(
-                    /[A-Z]/.test(signupModel().password) &&
-                    /[a-z]/.test(signupModel().password) &&
-                    /\d/.test(signupModel().password)
-                  )
-                "
-                [class.border-green-dark]="
-                  /[A-Z]/.test(signupModel().password) &&
-                  /[a-z]/.test(signupModel().password) &&
-                  /\d/.test(signupModel().password)
-                "
-                [class.text-green-dark]="
-                  /[A-Z]/.test(signupModel().password) &&
-                  /[a-z]/.test(signupModel().password) &&
-                  /\d/.test(signupModel().password)
-                "
-              >
+              <span class="grid size-3 shrink-0 place-items-center">
                 @if ( /[A-Z]/.test(signupModel().password) && /[a-z]/.test(signupModel().password)
                 && /\d/.test(signupModel().password) ) {
-                <span class="flex items-center justify-center text-[9px]">✓</span>
+                <img src="assets/icons/ticked-icon.svg" class="size-3" alt="Valid" />
+                } @else {
+                <img src="assets/icons/circle-icon.svg" class="size-3" alt="Invalid" />
                 }
               </span>
               <span class="text-[0.6875rem] text-gray-medium"
@@ -248,42 +219,12 @@
               >
             </li>
 
-            <!-- <li class="flex items-center gap-2">
-              <span
-                class="grid size-3 shrink-0 place-items-center rounded-full border"
-                [class.border-surface-medium]="
-                  /\s/.test(signupModel().password)
-                "
-                [class.border-green-dark]="
-                  !/\s/.test(signupModel().password)
-                "
-                [class.text-green-dark]="
-                  !/\s/.test(signupModel().password)
-                "
-              >
-                @if (signupModel().password && !/\s/.test(signupModel().password)) {
-                <span class="flex items-center justify-center text-[9px]">✓</span>
-                }
-              </span>
-
-              <span class="text-[0.6875rem] text-gray-medium"> No spaces </span>
-            </li> -->
-
             <li class="flex items-center gap-2">
-              <span
-                class="grid size-3 shrink-0 place-items-center rounded-full border"
-                [class.border-surface-medium]="
-                  !/[!@#$%^&*]/.test(signupModel().password)
-                "
-                [class.border-green-dark]="
-                  /[!@#$%^&*]/.test(signupModel().password)
-                "
-                [class.text-green-dark]="
-                  /[!@#$%^&*]/.test(signupModel().password)
-                "
-              >
+              <span class="grid size-3 shrink-0 place-items-center">
                 @if (/[!@#$%^&*]/.test(signupModel().password)) {
-                <span class="flex items-center justify-center text-[9px]">✓</span>
+                <img src="assets/icons/ticked-icon.svg" class="size-3" alt="Valid" />
+                } @else {
+                <img src="assets/icons/circle-icon.svg" class="size-3" alt="Invalid" />
                 }
               </span>
               <span class="text-[0.6875rem] text-gray-medium">One special character</span>
