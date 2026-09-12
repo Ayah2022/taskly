@@ -104,4 +104,6 @@
   --size-control-sm: 2rem;
   --size-control-md: 2.5rem;
   --size-control-lg: 3rem;
+
+  --box-shadow: 0 24px 48px rgba(4, 27, 60, 0.06);
 }

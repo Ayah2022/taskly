@@ -13,7 +13,7 @@
 
   <main class="mx-auto flex w-full justify-center">
     <section
-      class="mt-10 w-full md:w-[40.5%] rounded-xl bg-white p-6 shadow-[0_24px_48px_rgba(4,27,60,0.06)] sm:mt-12 sm:p-10 lg:mt-14 lg:p-12"
+      class="mt-10 w-full md:w-[40.5%] rounded-xl bg-white p-6 shadow-card sm:mt-12 sm:p-10 lg:mt-14 lg:p-12"
     >
       <div class="mb-8">
         <h1 class="headline-lg text-start md:text-center text-slate-dark">Welcome Back</h1>
@@ -36,7 +36,7 @@
             autocomplete="email"
             placeholder="yourname@company.com"
             [formField]="loginForm.email"
-            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-4 text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
           />
 
           @if (loginForm.email().touched() && loginForm.email().invalid()) {
@@ -57,7 +57,7 @@
 
             <a
               routerLink="/forgot-password"
-              class="mb-[8px] text-[0.6875rem] font-bold text-primary hover:cursor-pointer"
+              class="mb-2 text-sm font-bold text-primary hover:cursor-pointer"
             >
               <span class="hidden sm:inline">Forgot Password?</span>
               <span class="sm:hidden">Forgot?</span>
@@ -71,7 +71,7 @@
               autocomplete="current-password"
               placeholder="Enter your password"
               [formField]="loginForm.password"
-              class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+              class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-4 text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
             />
 
             <button

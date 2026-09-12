@@ -13,7 +13,7 @@
 
   <main class="mx-auto flex w-full justify-center">
     <section
-      class="mt-10 w-full md:w-[45%] rounded-xl bg-white p-6 shadow-[0_24px_48px_rgba(4,27,60,0.06)] sm:mt-12 sm:p-10 lg:mt-14 lg:p-12"
+      class="mt-10 w-full md:w-[45%] rounded-xl bg-white p-6 shadow-card sm:mt-12 sm:p-10 lg:mt-14 lg:p-12"
     >
       <div class="mb-8">
         <h1 class="headline-lg text-start md:text-center">Create your workspace</h1>
@@ -34,10 +34,10 @@
             autocomplete="name"
             placeholder="Enter your full name"
             [formField]="signupForm.name"
-            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-4 text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
           />
 
-          <p class="mt-1.5 text-[0.6875rem] text-slate-light">3-50 characters, letters only.</p>
+          <p class="mt-1.5 text-xs text-slate-light">3-50 characters, letters only.</p>
 
           @if ( signupForm.name().touched() && signupForm.name().invalid() ) {
           <div class="mt-2 space-y-1" role="alert">
@@ -60,7 +60,7 @@
             autocomplete="email"
             placeholder="yourname@company.com"
             [formField]="signupForm.email"
-            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-4 text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
           />
 
           @if ( signupForm.email().touched() && signupForm.email().invalid() ) {
@@ -76,7 +76,7 @@
         <div>
           <label for="signup-job-title" class="label-sm block uppercase text-slate-medium">
             Job title
-            <span class="text-[0.6875rem] text-surface-medium"> (optional) </span>
+            <span class="text-xs text-surface-medium"> (optional) </span>
           </label>
 
           <input
@@ -85,7 +85,7 @@
             autocomplete="organization-title"
             placeholder="e.g. Project Manager"
             [formField]="signupForm.jobTitle"
-            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+            class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-4 text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
           />
         </div>
 
@@ -103,7 +103,7 @@
                 autocomplete="new-password"
                 placeholder="Password"
                 [formField]="signupForm.password"
-                class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+                class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-4 text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
               />
 
               <button
@@ -142,7 +142,7 @@
                 autocomplete="new-password"
                 placeholder="Repeat your password"
                 [formField]="signupForm.confirmPassword"
-                class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-[14px] text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
+                class="w-full rounded-md border border-transparent bg-surface-highest px-4 py-4 text-base text-slate-dark outline-none transition placeholder:text-surface-medium"
               />
               <!-- <button
                 type="button"
@@ -181,7 +181,7 @@
                 <img src="assets/icons/circle-icon.svg" class="size-3" alt="Invalid" />
                 }
               </span>
-              <span class="text-[0.6875rem] text-gray-medium">At least 8 characters</span>
+              <span class="text-xs text-gray-medium">At least 8 characters</span>
             </li>
 
             <li class="flex items-center gap-2">
@@ -193,9 +193,7 @@
                 <img src="assets/icons/circle-icon.svg" class="size-3" alt="Invalid" />
                 }
               </span>
-              <span class="text-[0.6875rem] text-gray-medium"
-                >One uppercase, lowercase, and digit</span
-              >
+              <span class="text-xs text-gray-medium">One uppercase, lowercase, and digit</span>
             </li>
 
             <li class="flex items-center gap-2">
@@ -206,7 +204,7 @@
                 <img src="assets/icons/circle-icon.svg" class="size-3" alt="Invalid" />
                 }
               </span>
-              <span class="text-[0.6875rem] text-gray-medium">One special character</span>
+              <span class="text-xs text-gray-medium">One special character</span>
             </li>
           </ul>
         </div>
