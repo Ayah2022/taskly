@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { email, FormField, FormRoot, form, required, minLength } from '@angular/forms/signals';
+import { email, FormField, FormRoot, form, required } from '@angular/forms/signals';
 import { RouterLink, Router } from '@angular/router';
 
 import { LoginService } from '../../services/login.service';
@@ -39,10 +39,6 @@ export class Login {
       required(schemaPath.password, {
         message: 'Password is required.',
       });
-
-      minLength(schemaPath.password, 8, {
-        message: 'Password must be at least 8 characters.',
-      });
     },
     {
       submission: {
@@ -50,20 +46,17 @@ export class Login {
           this.loginError.set(null);
           this.loginSuccess.set(false);
 
-          try {
-            const result = await this.loginService.login(field().value());
+          const result = await this.loginService.login(field().value());
 
-            if (!result.ok) {
-              this.loginError.set(result.message ?? 'Unable to log in. Please try again.');
+          if (!result.ok) {
+            this.loginError.set(result.message ?? 'Unable to log in. Please try again.');
 
-              return;
-            }
-
-            this.loginSuccess.set(true);
-            this.router.navigate(['/projects']);
-          } catch {
-            this.loginError.set('Something went wrong. Please try again.');
+            return;
           }
+
+          // this.loginSuccess.set(true);
+
+          await this.router.navigate(['/projects']);
         },
       },
     },

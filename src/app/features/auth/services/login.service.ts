@@ -3,14 +3,13 @@ import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-
+import { AuthService } from '../../../core/services/auth.service';
 import type { LoginModel } from '../models/login.model';
 import type { LoginResponse } from '../models/login-response.model';
 
 export interface LoginResult {
   ok: boolean;
   message?: string;
-  session?: LoginResponse;
 }
 
 @Injectable({
@@ -18,7 +17,7 @@ export interface LoginResult {
 })
 export class LoginService {
   private readonly http = inject(HttpClient);
-
+  private readonly authService = inject(AuthService);
   private readonly endpoint = `${environment.apiUrl}/auth/v1/token`;
 
   async login(data: LoginModel): Promise<LoginResult> {
@@ -38,10 +37,13 @@ export class LoginService {
           },
         ),
       );
+      this.authService.setSession(
+        session,
+        data.rememberMe,
+      );
 
       return {
-        ok: true,
-        session,
+        ok: true
       };
     } catch (error) {
       return {
