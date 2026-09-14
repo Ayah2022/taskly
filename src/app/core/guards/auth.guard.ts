@@ -3,13 +3,20 @@ import { CanActivateFn, Router } from '@angular/router';
 
 import { AuthService } from '../services/auth.service';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = async () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.isAuthenticated()) {
+  const authenticated = await authService.restoreSession();
+
+  console.log('AUTH GUARD:', authenticated);
+
+  if (authenticated) {
     return true;
   }
-    //redirect to login if not authenticated
+
+  console.log('NO SESSION → LOGIN');
+  //redirect to login if not authenticated
+
   return router.createUrlTree(['/login']);
 };

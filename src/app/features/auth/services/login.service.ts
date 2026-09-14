@@ -6,6 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 import type { LoginModel } from '../models/login.model';
 import type { LoginResponse } from '../models/login-response.model';
+import { StorageService } from '../../../core/services/storage.service';
 
 export interface LoginResult {
   ok: boolean;
@@ -18,6 +19,8 @@ export interface LoginResult {
 export class LoginService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
+  private readonly storageService = inject(StorageService);
+
   private readonly endpoint = `${environment.apiUrl}/auth/v1/token`;
 
   async login(data: LoginModel): Promise<LoginResult> {
@@ -37,13 +40,10 @@ export class LoginService {
           },
         ),
       );
-      this.authService.setSession(
-        session,
-        data.rememberMe,
-      );
+      this.storageService.setSession(session, data.rememberMe);
 
       return {
-        ok: true
+        ok: true,
       };
     } catch (error) {
       return {

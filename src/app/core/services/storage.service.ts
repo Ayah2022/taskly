@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
 import type { LoginResponse } from '../../features/auth/models/login-response.model';
+
+interface StoredSession {
+  session: LoginResponse;
+  rememberMe: boolean;
+  expiresAt: number | null;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -7,26 +13,75 @@ export class StorageService {
   private readonly sessionKey = 'taskly_session';
 
   setSession(session: LoginResponse, rememberMe: boolean): void {
+    const expiresAt = rememberMe ? Date.now() + 30 * 24 * 60 * 60 * 1000 : null;
+
+    const storedSession: StoredSession = {
+      session,
+      rememberMe,
+      expiresAt,
+    };
+
     const storage = rememberMe ? localStorage : sessionStorage;
 
-    storage.setItem(this.sessionKey, JSON.stringify(session));
+    storage.setItem(this.sessionKey, JSON.stringify(storedSession));
   }
 
-  getSession(): LoginResponse | null {
-    const session =
-      localStorage.getItem(this.sessionKey) ??
-      sessionStorage.getItem(this.sessionKey);
+  getStoredSession(): StoredSession | null {
+    const stored = localStorage.getItem(this.sessionKey) ?? sessionStorage.getItem(this.sessionKey);
 
-    if (!session) {
+    if (!stored) {
       return null;
     }
 
-    return JSON.parse(session) as LoginResponse;
+    try {
+      return JSON.parse(stored) as StoredSession;
+    } catch {
+      this.clearSession();
+      return null;
+    }
   }
 
+  getSession(): LoginResponse | null {
+    return this.getStoredSession()?.session ?? null;
+  }
 
   getAccessToken(): string | null {
     return this.getSession()?.access_token ?? null;
+  }
+
+  getRefreshToken(): string | null {
+    return this.getSession()?.refresh_token ?? null;
+  }
+
+  isRememberMe(): boolean {
+    return this.getStoredSession()?.rememberMe ?? false;
+  }
+
+  hasRememberMeExpired(): boolean {
+    const stored = this.getStoredSession();
+
+    if (!stored?.rememberMe || !stored.expiresAt) {
+      return false;
+    }
+
+    return Date.now() >= stored.expiresAt;
+  }
+
+  updateSession(session: LoginResponse): void {
+    const stored = this.getStoredSession();
+
+    if (!stored) {
+      return;
+    }
+
+    const updatedSession: StoredSession = {
+      ...stored,
+      session,
+    };
+
+    const storage = stored.rememberMe ? localStorage : sessionStorage;
+
+    storage.setItem(this.sessionKey, JSON.stringify(updatedSession));
   }
 
   clearSession(): void {
