@@ -1,0 +1,85 @@
+<aside
+  [class.w-64]="!sidebarCollapsed()"
+  [class.w-20]="sidebarCollapsed()"
+  class="flex h-screen shrink-0 flex-col items-start bg-surface-low px-4 py-4 transition-all ease-in"
+>
+  <!-- Logo -->
+  <div class="flex w-full items-center px-3 py-1">
+    <a routerLink="/projects" class="flex items-center gap-2" aria-label="Taskly home">
+      <img src="assets/branding/taskly-logo.svg" alt="" class="size-6" />
+
+      <span class="app-name tracking-1 font-bold text-xl" [class.hidden]="sidebarCollapsed()">
+        TASKLY
+      </span>
+    </a>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="mt-8 w-full" aria-label="Main navigation">
+    <ul class="space-y-1">
+      <!-- Projects -->
+      <li>
+        <a
+          routerLink="/projects"
+          routerLinkActive="bg-white text-primary"
+          #rla="routerLinkActive"
+          class="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-slate-dark transition"
+        >
+          <img
+            [src]="
+                        rla.isActive
+                        ? 'assets/icons/folder-active.svg'
+                        : 'assets/icons/folder.svg'
+                    "
+            alt=""
+            class="size-6"
+          />
+
+          <span
+            [class.hidden]="sidebarCollapsed()"
+            [class.text-primary]="rla.isActive"
+            [class.text-slate-dark]="!rla.isActive"
+          >
+            Projects
+          </span>
+        </a>
+      </li>
+
+      <!-- Statistics -->
+      <li>
+        <a
+          href="#"
+          class="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-slate-dark transition"
+        >
+          <img src="assets/icons/bar-chart.svg" alt="" class="size-6" />
+
+          <span [class.hidden]="sidebarCollapsed()">My Statistics</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Bottom navigation -->
+  <div class="mt-auto w-full border-t border-slate-light pt-6">
+    <!-- Collapse -->
+    <button
+      type="button"
+      (click)="toggleSidebar()"
+      class="flex h-10 w-full items-center cursor-pointer gap-3 px-3 text-sm font-medium text-slate-dark"
+    >
+      <img src="assets/icons/arrow-left.svg" alt="" class="size-5" />
+
+      <span [class.hidden]="sidebarCollapsed()">Collapse</span>
+    </button>
+
+    <!-- Logout -->
+    <button
+      type="button"
+      class="mt-2 flex h-10 cursor-pointer w-full items-center gap-3 px-3 text-sm font-medium text-error"
+    >
+      <img src="assets/icons/logout-icon.svg" alt="" class="size-5" />
+
+      <span [class.hidden]="sidebarCollapsed()">Logout</span>
+    </button>
+  </div>
+</aside>
