@@ -71,6 +71,12 @@
   --font-weight-label-sm: 700;
   --letter-spacing-label-sm: 1.1px;
 
+  /* tiny text */
+  --text-tiny: 10px;
+  --text-tiny--line-height: 20px;
+  --text-tiny--letter-spacing: 1;
+  --text-tiny--font-weight: 700;
+
   /* === BORDER RADIUS TOKENS === */
 
   --radius-none: 0;

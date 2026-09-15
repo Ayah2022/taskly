@@ -37,6 +37,13 @@ select {
     letter-spacing: var(--letter-spacing-body-md);
   }
 
+  .text-tiny {
+    font-size: var(--text-tiny);
+    line-height: var(--text-tiny--line-height);
+    font-weight: var(--text-tiny--font-weight);
+    letter-spacing: var(--text-tiny--letter-spacing);
+  }
+
   .label-sm {
     font-size: var(--font-size-label-sm);
     line-height: var(--line-height-label-sm);

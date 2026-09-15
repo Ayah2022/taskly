@@ -1,22 +1,26 @@
 <header
   class="flex h-16 shrink-0 items-center justify-end border-b border-slate-light bg-background px-8"
 >
-  <div class="flex items-center gap-3">
+  @if (user(); as currentUser) {
+  <div class="flex items-center gap-4">
     <!-- User information -->
-    <div class="border-r border-slate-light pr-4 text-right">
-      <p class="text-sm font-semibold leading-tight text-slate-dark">Mahmoud Taha</p>
+    <div class="text-end">
+      <p class="text-sm font-semibold leading-tight text-slate-dark">
+        {{ currentUser.user_metadata.name }}
+      </p>
 
-      <p class="mt-1 text-[11px] font-bold uppercase tracking-[1.1px] text-primary">
-        Project Manager
+      <p class="text-tiny font-extrabold uppercase text-primary">
+        {{ currentUser.user_metadata.job_title }}
       </p>
     </div>
 
     <!-- Avatar -->
     <div
-      class="grid size-10 shrink-0 place-items-center rounded-md bg-primary text-sm font-semibold text-white"
-      aria-label="Mahmoud Taha"
+      class="grid size-10 shrink-0 place-items-center rounded-md bg-primary-container text-sm font-semibold text-white"
+      [attr.aria-label]="currentUser.user_metadata.name"
     >
-      MT
+      {{ getUserInitials(currentUser.user_metadata.name) }}
     </div>
   </div>
+  }
 </header>
