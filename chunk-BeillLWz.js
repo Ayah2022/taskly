@@ -1,0 +1,1 @@
+import{Kt as ov,St as cy,f as Ca,nt as Ta}from"./chunk-8IZXBMjY.js";var a=class t{static ɵfac=function(e){return new(e||t)};static ɵcmp=cy({type:t,selectors:[[`app-projects`]],decls:2,vars:0,template:function(e,p){e&1&&(Ta(0,`p`),ov(1,`projects works!`),Ca())},encapsulation:2})};export{a as Projects};

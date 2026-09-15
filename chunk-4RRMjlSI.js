@@ -1,1 +1,0 @@
-import{B as dd,F as _m,H as fd,_ as Iy}from"./main-DHRRL74A.js";var a=class t{static ɵfac=function(e){return new(e||t)};static ɵcmp=_m({type:t,selectors:[[`app-projects`]],decls:2,vars:0,template:function(e,p){e&1&&(dd(0,`p`),Iy(1,`projects works!`),fd())},encapsulation:2})};export{a as Projects};
