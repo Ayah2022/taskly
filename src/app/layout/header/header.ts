@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, output, signal } from '@angular/core';
 
 import { UserService } from '../../core/services/user.service';
 import type { UserModel } from '../../core/models/user.model';
@@ -9,7 +9,7 @@ import type { UserModel } from '../../core/models/user.model';
 })
 export class Header implements OnInit {
   private readonly userService = inject(UserService);
-
+  readonly menuToggle = output<void>();
   readonly user = signal<UserModel | null>(null);
 
   async ngOnInit(): Promise<void> {

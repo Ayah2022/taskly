@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
@@ -9,7 +9,15 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class Sidebar {
   readonly sidebarCollapsed = signal(false);
+  readonly mobileMenuOpen = input(false);
 
+  readonly closeMobileMenu = output<void>();
+
+  readonly activeProjectExpanded = signal(false);
+
+  toggleActiveProject(): void {
+    this.activeProjectExpanded.update((open) => !open);
+  }
   toggleSidebar(): void {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
   }

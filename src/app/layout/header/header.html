@@ -1,10 +1,23 @@
 <header
-  class="flex h-16 shrink-0 items-center justify-end border-b border-slate-light bg-background px-8"
+  class="flex h-16 shrink-0 items-center justify-between lg:justify-end border-b border-slate-light px-6 lg:px-8"
 >
+  <!-- Mobile -->
+  <div class="flex items-center gap-4 lg:hidden">
+    <button
+      type="button"
+      aria-label="Open menu"
+      class="grid size-8 place-items-center"
+      (click)="menuToggle.emit()"
+    >
+      <img src="assets/icons/menu.svg" alt="" class="size-6" />
+    </button>
+
+    <span class="text-xl font-bold text-slate-dark"> TASKLY </span>
+  </div>
   @if (user(); as currentUser) {
-  <div class="flex items-center gap-4">
+  <div class="items-center gap-4 flex">
     <!-- User information -->
-    <div class="text-end">
+    <div class="text-end hidden lg:flex lg:flex-col">
       <p class="text-sm font-semibold leading-tight text-slate-dark">
         {{ currentUser.user_metadata.name }}
       </p>

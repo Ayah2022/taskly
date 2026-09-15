@@ -1,7 +1,7 @@
 <aside
   [class.w-64]="!sidebarCollapsed()"
   [class.w-20]="sidebarCollapsed()"
-  class="flex h-screen shrink-0 flex-col items-start bg-surface-low px-4 py-4 transition-all ease-in"
+  class="hidden lg:flex h-screen shrink-0 flex-col items-start px-4 py-4 transition-all ease-in"
 >
   <!-- Logo -->
   <div class="flex w-full items-center px-3 py-1">
@@ -59,6 +59,37 @@
     </ul>
   </nav>
 
+  <!-- Active project dropdown -->
+  <!-- <button
+    type="button"
+    class="flex h-12 w-full items-center justify-between rounded-md bg-surface-highest px-3"
+    (click)="toggleActiveProject()"
+  >
+    <span class="flex min-w-0 items-center gap-3">
+      <img src="assets/icons/folder.svg" alt="" class="size-6 shrink-0" />
+
+      <span class="truncate text-sm font-semibold text-slate-dark"> Active Project Name </span>
+    </span>
+
+    <img
+      src="assets/icons/arrow-up.svg"
+      alt=""
+      class="size-3"
+      [class.rotate-180]="!activeProjectExpanded()"
+    />
+  </button>
+  @if (activeProjectExpanded()) {
+  <div class="bg-white">
+    <a href="#"> Epics </a>
+
+    <a href="#"> Tasks </a>
+
+    <a href="#"> Members </a>
+
+    <a href="#"> Details </a>
+  </div>
+  } -->
+
   <!-- Bottom navigation -->
   <div class="mt-auto w-full border-t border-slate-light pt-6">
     <!-- Collapse -->
@@ -76,6 +107,87 @@
     <button
       type="button"
       class="mt-2 flex h-10 cursor-pointer w-full items-center gap-3 px-3 text-sm font-medium text-error"
+    >
+      <img src="assets/icons/logout-icon.svg" alt="" class="size-5" />
+
+      <span [class.hidden]="sidebarCollapsed()">Logout</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Mobile Sidebar -->
+<aside
+  class="fixed inset-0 z-50 flex h-screen w-full flex-col px-6 py-4 lg:hidden"
+  [class.hidden]="!mobileMenuOpen()"
+>
+  <!-- mobile sidebar content -->
+  <div class="flex h-16 items-center justify-between lg:hidden">
+    <div class="flex items-center gap-2">
+      <img src="assets/branding/taskly-logo.svg" alt="" class="size-6" />
+
+      <span class="text-xl font-bold text-slate-dark"> TASKLY </span>
+    </div>
+
+    <button
+      type="button"
+      aria-label="Close menu"
+      class="grid size-8 place-items-center"
+      (click)="closeMobileMenu.emit()"
+    >
+      <img src="assets/icons/close.svg" alt="" class="size-3.5" />
+    </button>
+  </div>
+  <!-- Navigation -->
+  <nav class="mt-8 w-full" aria-label="Main navigation">
+    <ul class="space-y-1">
+      <!-- Projects -->
+      <li>
+        <a
+          routerLink="/projects"
+          routerLinkActive="bg-white text-primary"
+          #rla="routerLinkActive"
+          class="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-slate-dark transition"
+        >
+          <img
+            [src]="
+                        rla.isActive
+                        ? 'assets/icons/folder-active.svg'
+                        : 'assets/icons/folder.svg'
+                    "
+            alt=""
+            class="size-6"
+          />
+
+          <span
+            [class.hidden]="sidebarCollapsed()"
+            [class.text-primary]="rla.isActive"
+            [class.text-slate-dark]="!rla.isActive"
+          >
+            Projects
+          </span>
+        </a>
+      </li>
+
+      <!-- Statistics -->
+      <li>
+        <a
+          href="#"
+          class="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-slate-dark transition"
+        >
+          <img src="assets/icons/bar-chart.svg" alt="" class="size-6" />
+
+          <span [class.hidden]="sidebarCollapsed()">My Statistics</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Bottom navigation -->
+  <div class="mt-auto w-full border-t border-slate-light pt-6">
+    <!-- Logout -->
+    <button
+      type="button"
+      class="mt-2 flex h-10 cursor-pointer w-full items-center gap-3 px-1 text-sm font-medium text-error"
     >
       <img src="assets/icons/logout-icon.svg" alt="" class="size-5" />
 
