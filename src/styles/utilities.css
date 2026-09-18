@@ -61,6 +61,12 @@ select {
   .label-breadcrumb.active {
     color: var(--primary);
   }
+  .page-title {
+    font-size: 36px;
+    line-height: 40px;
+    letter-spacing: -0.6px;
+    font-weight: 600;
+  }
 
   @media (max-width: 767px) {
     .display-lg {
