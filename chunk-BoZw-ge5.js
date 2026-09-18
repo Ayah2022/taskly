@@ -1,0 +1,1 @@
+import{V as Na,_n as vv,ot as Sa,qt as gy}from"./chunk-4KjIl1Ss.js";var n=class t{static ɵfac=function(e){return new(e||t)};static ɵcmp=gy({type:t,selectors:[[`app-project-details`]],decls:2,vars:0,template:function(e,c){e&1&&(Na(0,`p`),vv(1,`project-details works!`),Sa())},encapsulation:2})};export{n as ProjectDetails};

@@ -1,1 +1,0 @@
-var t=[{path:``,loadComponent:()=>import(`./chunk-BeillLWz.js`).then(o=>o.Projects)}];export{t as PROJECTS_ROUTES};
