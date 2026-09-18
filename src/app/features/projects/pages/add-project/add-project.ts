@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { form, FormField, maxLength, minLength, required } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
-
+import { HttpErrorResponse } from '@angular/common/http';
 import type { AddProjectModel } from '../../models/addProject.model';
 import { ProjectsService } from '../../services/projects.service';
 
@@ -17,6 +17,7 @@ export class AddProject {
 
   readonly submitting = signal(false);
   readonly submitError = signal<string | null>(null);
+  readonly successMessage = signal<string | null>(null);
 
   readonly projectModel = signal<AddProjectModel>({
     name: '',
@@ -25,11 +26,11 @@ export class AddProject {
 
   readonly projectForm = form(this.projectModel, (schema) => {
     required(schema.name, {
-      message: 'Project Name is required.',
+      message: 'Project Title is required.',
     });
 
     minLength(schema.name, 3, {
-      message: 'Project Name must be at least 3 characters.',
+      message: 'Project Title must be at least 3 characters.',
     });
 
     maxLength(schema.description, 500, {
@@ -38,8 +39,16 @@ export class AddProject {
   });
 
   async submit(): Promise<void> {
-    this.submitError.set(null);
+    // Prevent duplicate submissions
+    if (this.submitting()) {
+      return;
+    }
 
+    // Clear previous API messages
+    this.submitError.set(null);
+    this.successMessage.set(null);
+
+    // Stop if client-side validation fails
     if (this.projectForm().invalid()) {
       this.projectForm().markAsTouched();
       return;
@@ -48,15 +57,55 @@ export class AddProject {
     this.submitting.set(true);
 
     try {
-      const project = await this.projectService.createProject(this.projectModel());
+      await this.projectService.createProject(this.projectModel());
 
-      await this.router.navigate(['/projects', project.id]);
+      // Clear form after successful API response
+      this.projectForm().reset({
+        name: '',
+        description: '',
+      });
+
+      // Show success message
+      this.successMessage.set('Project created successfully');
+      // Wait before redirecting
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Redirect to projects
+      await this.router.navigate(['/projects']);
     } catch (error) {
       console.error('Failed to create project:', error);
 
-      this.submitError.set('Failed to add new project. Try again later.');
+      // Preserve the form values.
+      this.submitError.set(this.getErrorMessage(error));
     } finally {
+      // Always re-enable the button
       this.submitting.set(false);
     }
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const apiError = error.error;
+
+      if (typeof apiError === 'string') {
+        return apiError;
+      }
+
+      if (apiError?.message) {
+        return apiError.message;
+      }
+
+      if (apiError?.error) {
+        return apiError.error;
+      }
+
+      return error.message || 'Failed to add new project. Try again later.';
+    }
+
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    return 'Failed to add new project. Try again later.';
   }
 }

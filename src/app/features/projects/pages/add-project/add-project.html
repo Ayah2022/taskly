@@ -1,8 +1,16 @@
 <div class="px-7 hidden lg:block">
   <h2 class="page-title">Add New Project</h2>
 </div>
-<div class="mt-10">
-  <div class="mx-auto pt-8 w-full max-w-2xl bg-white shadow-card">
+<div class="mt-2 lg:mt-12 mb-5 lg:mb-[100]">
+  @if (successMessage()) {
+  <div
+    class="fixed left-1/2 top-6 z-50 -translate-x-1/2 rounded-md bg-green-dark px-5 py-3 text-sm font-semibold text-white shadow-lg"
+    role="status"
+  >
+    {{ successMessage() }}
+  </div>
+  }
+  <div class="mx-auto pt-8 w-full max-w-2xl rounded-b-md bg-white shadow-card">
     <!-- Header -->
     <div class="mb-8 px-8 gap-2 flex items-center">
       <span class="bg-surface-low rounded-md p-3">
@@ -11,7 +19,7 @@
       <div class="flex justify-center items-start flex-col">
         <h1 class="text-2xl font-semibold text-slate-dark">Initialize New Project</h1>
 
-        <p class="mt-1 text-sm text-slate-medium">
+        <p class="text-sm text-slate-medium">
           Define the scope and foundational details of your project.
         </p>
       </div>
