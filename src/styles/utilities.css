@@ -51,6 +51,16 @@ select {
     letter-spacing: var(--letter-spacing-label-sm);
     margin-bottom: 8px;
   }
+  .label-breadcrumb {
+    color: var(--color-surface-medium);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+  }
+  .label-breadcrumb.active {
+    color: var(--primary);
+  }
 
   @media (max-width: 767px) {
     .display-lg {

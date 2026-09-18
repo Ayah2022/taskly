@@ -54,7 +54,7 @@ export class Login {
             return;
           }
 
-          // this.loginSuccess.set(true);
+          this.loginSuccess.set(true);
 
           await this.router.navigate(['/projects']);
         },

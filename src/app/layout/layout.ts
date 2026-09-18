@@ -3,10 +3,11 @@ import { Component, signal } from '@angular/core';
 
 import { Header } from './header/header';
 import { Sidebar } from './sidebar/sidebar';
+import { Breadcrumb } from '../shared/components/breadcrumb/breadcrumb';
 
 @Component({
   selector: 'app-layout',
-  imports: [Header, Sidebar, RouterOutlet],
+  imports: [Header, Sidebar, RouterOutlet, Breadcrumb],
   templateUrl: './layout.html',
 })
 export class Layout {

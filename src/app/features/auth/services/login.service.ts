@@ -21,13 +21,15 @@ export class LoginService {
   private readonly authService = inject(AuthService);
   private readonly storageService = inject(StorageService);
 
-  private readonly endpoint = `${environment.apiUrl}/auth/v1/token`;
+  private readonly loginEndpoint = `${environment.apiUrl}/auth/v1/token`;
+  private readonly logoutEndpoint = `${environment.apiUrl}/auth/v1/logout`;
+  
 
   async login(data: LoginModel): Promise<LoginResult> {
     try {
       const session = await firstValueFrom(
         this.http.post<LoginResponse>(
-          `${this.endpoint}?grant_type=password`,
+          `${this.loginEndpoint}?grant_type=password`,
           {
             email: data.email,
             password: data.password,
@@ -48,12 +50,37 @@ export class LoginService {
     } catch (error) {
       return {
         ok: false,
-        message: this.getErrorMessage(error),
+        message: this.getLoginErrorMessage(error),
       };
     }
   }
 
-  private getErrorMessage(error: unknown): string {
+  async logout(): Promise<LoginResult> {
+    try {
+      await firstValueFrom(
+        this.http.post<void>(
+          this.logoutEndpoint,
+          null,
+          {
+            headers: {
+              apikey: environment.apiKey,
+            },
+          },
+        ),
+      );
+
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        message: this.getLogoutErrorMessage(error),
+      };
+    }
+  }
+
+  private getLoginErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       if (typeof error.error?.msg === 'string') {
         return error.error.msg;
@@ -73,5 +100,23 @@ export class LoginService {
     }
 
     return 'Unable to log in. Please try again.';
+  }
+
+  private getLogoutErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      if (typeof error.error?.msg === 'string') {
+        return error.error.msg;
+      }
+
+      if (typeof error.error?.message === 'string') {
+        return error.error.message;
+      }
+
+      if (error.status === 0) {
+        return 'Unable to connect to the server.';
+      }
+    }
+
+    return 'Unable to log out. Please try again.';
   }
 }

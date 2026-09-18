@@ -1,0 +1,22 @@
+<nav aria-label="Breadcrumb">
+  <ol class="flex items-center gap-2">
+    @for (breadcrumb of breadcrumbs(); track breadcrumb.url; let last = $last) {
+    <li class="flex items-center gap-2">
+      @if (!last) {
+      <a
+        [routerLink]="breadcrumb.url"
+        class="label-breadcrumb transition hover:text-primary-container"
+      >
+        {{ breadcrumb.label }}
+      </a>
+
+      <span class="size-2">
+        <img src="assets/icons/grey-arrow-left.svg" class="size-2" alt="arrow" />
+      </span>
+      } @else {
+      <span class="label-breadcrumb active"> {{ breadcrumb.label }} </span>
+      }
+    </li>
+    }
+  </ol>
+</nav>

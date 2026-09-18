@@ -3,6 +3,15 @@
   [class.w-20]="sidebarCollapsed()"
   class="hidden lg:flex h-screen shrink-0 flex-col items-start px-4 py-4 transition-all ease-in"
 >
+  <!-- Server error -->
+  @if (logoutError()) {
+  <div
+    class="rounded-md border border-error/20 bg-error/10 px-4 py-3 text-sm font-medium text-error"
+    role="alert"
+  >
+    {{ logoutError() }}
+  </div>
+  }
   <!-- Logo -->
   <div class="flex w-full items-center px-3 py-1">
     <a routerLink="/projects" class="flex items-center gap-2" aria-label="Taskly home">
@@ -15,7 +24,7 @@
   </div>
 
   <!-- Navigation -->
-  <nav class="mt-8 w-full" aria-label="Main navigation">
+  <nav class="mt-8 py-4 w-full border-b border-slate-light" aria-label="Main navigation">
     <ul class="space-y-1">
       <!-- Projects -->
       <li>
@@ -60,35 +69,81 @@
   </nav>
 
   <!-- Active project dropdown -->
-  <!-- <button
-    type="button"
-    class="flex h-12 w-full items-center justify-between rounded-md bg-surface-highest px-3"
-    (click)="toggleActiveProject()"
-  >
-    <span class="flex min-w-0 items-center gap-3">
-      <img src="assets/icons/folder.svg" alt="" class="size-6 shrink-0" />
+  @if (activeProjectId()) {
+  <div class="relative py-4">
+    <button
+      type="button"
+      class="flex h-12 items-center justify-between gap-3 px-3 transition ease-out"
+      [class.w-full]="!sidebarCollapsed()"
+      [class.bg-surface-highest]="!sidebarCollapsed()"
+      [class.rounded-b-none]="activeProjectExpanded() && !sidebarCollapsed()"
+      [class.rounded-t-md]="activeProjectExpanded() && !sidebarCollapsed()"
+      [class.rounded-md]="!activeProjectExpanded() || sidebarCollapsed()"
+      [class.mx-auto]="sidebarCollapsed()"
+      [class.h-10]="sidebarCollapsed()"
+      [class.justify-center]="sidebarCollapsed()"
+      [class.bg-white]="sidebarCollapsed()"
+      (click)="toggleActiveProject()"
+    >
+      <span [class.hidden]="sidebarCollapsed()" class="flex items-center justify-center">
+        <img class="size-5 shrink-0" src="assets/icons/file.svg" alt="" />
+      </span>
+      <span [class.hidden]="!sidebarCollapsed()" class="flex items-center justify-center">
+        <img class="size-5 shrink-0" src="assets/icons/file-active.svg" alt="" />
+      </span>
 
-      <span class="truncate text-sm font-semibold text-slate-dark"> Active Project Name </span>
-    </span>
+      <span
+        [class.hidden]="sidebarCollapsed()"
+        class="truncate text-sm font-semibold text-slate-dark"
+      >
+        Active Project Name
+      </span>
 
-    <img
-      src="assets/icons/arrow-up.svg"
-      alt=""
-      class="size-3"
-      [class.rotate-180]="!activeProjectExpanded()"
-    />
-  </button>
-  @if (activeProjectExpanded()) {
-  <div class="bg-white">
-    <a href="#"> Epics </a>
+      <span class="px-1 py-2" [class.hidden]="sidebarCollapsed()">
+        <img
+          src="assets/icons/arrow-up.svg"
+          alt="arrow"
+          class="size-3"
+          [class.rotate-180]="!activeProjectExpanded()"
+        />
+      </span>
+    </button>
 
-    <a href="#"> Tasks </a>
-
-    <a href="#"> Members </a>
-
-    <a href="#"> Details </a>
+    @if (activeProjectExpanded()) {
+    <div
+      class="flex flex-col justify-center p-2"
+      [class.bg-white]="!sidebarCollapsed()"
+      [class.rounded-b-md]="!sidebarCollapsed()"
+      [class.bg-surface-highest]="sidebarCollapsed()"
+      [class.rounded-md]="sidebarCollapsed()"
+      [class.absolute]="sidebarCollapsed()"
+      [class.left-14]="sidebarCollapsed()"
+      [class.top-4]="sidebarCollapsed()"
+      [class.ml-2]="sidebarCollapsed()"
+      [class.rounded-l-none]="sidebarCollapsed()"
+      [class.w-48]="sidebarCollapsed()"
+      [class.z-20]="sidebarCollapsed()"
+    >
+      <a class="flex items-center justify-start gap-2 px-4 py-3" href="#">
+        <span class="flex h-full size-5"><img src="assets/icons/epics.svg" /></span
+        ><span>Epics</span>
+      </a>
+      <a class="flex items-center justify-start gap-2 px-4 py-3" href="#">
+        <span class="flex h-full size-5"><img src="assets/icons/tasks.svg" /></span
+        ><span>Tasks</span>
+      </a>
+      <a class="flex items-center justify-start gap-2 px-4 py-3" href="#">
+        <span class="flex h-full size-5"><img src="assets/icons/members.svg" /></span
+        ><span>Members</span>
+      </a>
+      <a class="flex items-center justify-start gap-2 px-4 py-3" href="#">
+        <span class="flex h-full size-5"><img src="assets/icons/details.svg" /></span
+        ><span>Details</span>
+      </a>
+    </div>
+    }
   </div>
-  } -->
+  }
 
   <!-- Bottom navigation -->
   <div class="mt-auto w-full border-t border-slate-light pt-6">
@@ -106,6 +161,8 @@
     <!-- Logout -->
     <button
       type="button"
+      (click)="onLogout()"
+      [disabled]="isLoggingOut"
       class="mt-2 flex h-10 cursor-pointer w-full items-center gap-3 px-3 text-sm font-medium text-error"
     >
       <img src="assets/icons/logout-icon.svg" alt="" class="size-5" />
@@ -117,7 +174,7 @@
 
 <!-- Mobile Sidebar -->
 <aside
-  class="fixed inset-0 z-50 flex h-screen w-full flex-col px-6 py-4 lg:hidden"
+  class="fixed inset-0 z-50 flex h-screen w-full flex-col px-6 py-4 lg:hidden bg-surface-low"
   [class.hidden]="!mobileMenuOpen()"
 >
   <!-- mobile sidebar content -->
@@ -182,11 +239,67 @@
     </ul>
   </nav>
 
+  <!-- Active project dropdown -->
+  <div class="py-4">
+    <button
+      type="button"
+      class="flex h-12 w-full items-center rounded-md gap-3 justify-between bg-surface-highest px-3 transition ease-out"
+      [class.rounded-b-none]="activeProjectExpanded()"
+      (click)="toggleActiveProject()"
+    >
+      <span class="flex justify-start items-center gap-3">
+        <img src="assets/icons/file.svg" alt="" class="size-5 shrink-0" />
+        <span
+          [class.hidden]="sidebarCollapsed()"
+          class="truncate text-sm font-semibold text-slate-dark"
+        >
+          Active Project Name
+        </span>
+      </span>
+
+      <span class="py-2 px-1" [class.hidden]="sidebarCollapsed()">
+        <img
+          src="assets/icons/arrow-up.svg"
+          alt="arrow"
+          class="size-3"
+          [class.rotate-180]="!activeProjectExpanded()"
+        />
+      </span>
+    </button>
+    @if (activeProjectExpanded()) {
+    <div
+      class="bg-white flex flex-col justify-center p-2 rounded-b-md"
+      [class.hidden]="sidebarCollapsed()"
+    >
+      <a class="flex py-3 px-4 gap-2 justify-start items-center" href="#"
+        ><span class="size-5 flex h-full"><img src="assets/icons/epics.svg" /></span
+        ><span> Epics </span></a
+      >
+
+      <a class="flex py-3 px-4 gap-2 justify-start items-center" href="#"
+        ><span class="size-5 flex h-full"><img src="assets/icons/tasks.svg" /></span
+        ><span> Tasks </span></a
+      >
+
+      <a class="flex py-3 px-4 gap-2 justify-start items-center" href="#"
+        ><span class="size-5 flex h-full"><img src="assets/icons/members.svg" /></span
+        ><span> Members</span>
+      </a>
+
+      <a class="flex py-3 px-4 gap-2 justify-start items-center" href="#"
+        ><span class="size-5 flex h-full"><img src="assets/icons/details.svg" /></span
+        ><span> Details</span></a
+      >
+    </div>
+    }
+  </div>
   <!-- Bottom navigation -->
   <div class="mt-auto w-full border-t border-slate-light pt-6">
     <!-- Logout -->
     <button
       type="button"
+      (click)="onLogout()"
+      [disabled]="isLoggingOut"
       class="mt-2 flex h-10 cursor-pointer w-full items-center gap-3 px-1 text-sm font-medium text-error"
     >
       <img src="assets/icons/logout-icon.svg" alt="" class="size-5" />

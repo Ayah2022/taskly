@@ -1,0 +1,52 @@
+<div class="p-6">
+  <!-- header section from before -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Projects</h1>
+      <p class="mt-1 text-sm text-slate-500">Manage and curate your projects</p>
+    </div>
+    <a
+      routerLink="/projects/add"
+      class="hidden lg:flex mt-auto cursor-pointer rounded-xs bg-primary-gradient px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-in-out hover:scale-[1.02]"
+    >
+      Create New Project
+    </a>
+  </div>
+
+  <!-- project cards grid -->
+  <div class="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @for (project of projects(); track project.id) {
+    <app-project-card
+      [id]="project.id"
+      [name]="project.name"
+      [description]="project.description"
+      [createdAt]="project.created_at"
+    />
+    }
+    <!-- Add project card — desktop only -->
+    <a
+      routerLink="/projects/add"
+      class="hidden flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-blue-400 hover:text-blue-700 lg:flex"
+    >
+      <span class="flex size-9 items-center justify-center rounded-full bg-slate-100">
+        <img src="assets/icons/plus-circle.svg" alt="" class="size-4" />
+      </span>
+
+      <span class="text-xs font-semibold tracking-wide"> ADD PROJECT </span>
+    </a>
+
+    <!-- Add project button — mobile only -->
+    <a
+      routerLink="/projects/add"
+      aria-label="Add project"
+      class="fixed right-5 p-5 bottom-20 z-30 flex items-center justify-center rounded-lg bg-primary-gradient text-white shadow-card transition hover:scale-105 lg:hidden"
+    >
+      <img src="assets/icons/plus.svg" alt="" class="size-3.5" />
+    </a>
+  </div>
+
+  <!-- pagination -->
+  <div class="mt-6 flex justify-center">
+    <!-- your pagination component/markup here -->
+  </div>
+</div>

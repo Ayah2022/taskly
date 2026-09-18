@@ -7,7 +7,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const storageService = inject(StorageService);
 
   const token = storageService.getAccessToken();
-
+  console.log('[authInterceptor]', req.url, 'token:', token);
   if (!token) {
     return next(req);
   }
