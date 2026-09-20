@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import type { LoginResponse } from '../../features/auth/models/login-response.model';
+
+import type { LoginResponse } from '../../features/auth/models/login';
 
 interface StoredSession {
   session: LoginResponse;
   rememberMe: boolean;
-  expiresAt: number | null;
+  rememberMeExpiresAt: number | null;
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -13,17 +15,24 @@ export class StorageService {
   private readonly sessionKey = 'taskly_session';
 
   setSession(session: LoginResponse, rememberMe: boolean): void {
-    const expiresAt = rememberMe ? Date.now() + 30 * 24 * 60 * 60 * 1000 : null;
-
     const storedSession: StoredSession = {
       session,
       rememberMe,
-      expiresAt,
+      rememberMeExpiresAt: rememberMe ? Date.now() + 30 * 24 * 60 * 60 * 1000 : null,
     };
 
     const storage = rememberMe ? localStorage : sessionStorage;
 
     storage.setItem(this.sessionKey, JSON.stringify(storedSession));
+  }
+  hasRememberMeExpired(): boolean {
+    const stored = this.getStoredSession();
+
+    if (!stored?.rememberMe || !stored.rememberMeExpiresAt) {
+      return false;
+    }
+
+    return Date.now() >= stored.rememberMeExpiresAt;
   }
 
   getStoredSession(): StoredSession | null {
@@ -57,16 +66,6 @@ export class StorageService {
     return this.getStoredSession()?.rememberMe ?? false;
   }
 
-  hasRememberMeExpired(): boolean {
-    const stored = this.getStoredSession();
-
-    if (!stored?.rememberMe || !stored.expiresAt) {
-      return false;
-    }
-
-    return Date.now() >= stored.expiresAt;
-  }
-
   updateSession(session: LoginResponse): void {
     const stored = this.getStoredSession();
 
@@ -89,7 +88,7 @@ export class StorageService {
     sessionStorage.removeItem(this.sessionKey);
   }
 
-  hasAccessToken(): boolean {
-    return !!this.getAccessToken();
+  hasSession(): boolean {
+    return this.getSession() !== null;
   }
 }

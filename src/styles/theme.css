@@ -20,7 +20,8 @@
   --color-warning: var(--warning);
 
   --shadow-card: var(--box-shadow);
-  --text-xxs:var(--text-tiny);
+  --shadow-load: var(--load-shadow);
+  --text-xxs: var(--text-tiny);
   --tracking-1: -0.5px;
   --tracking-2: -0.75px;
   --tracking-3: -0.8px;

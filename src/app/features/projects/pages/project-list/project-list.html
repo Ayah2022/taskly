@@ -1,4 +1,74 @@
 <div class="p-6">
+  @if (isLoading()) {
+  <!-- Loading state -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Projects</h1>
+      <p class="mt-1 text-sm text-slate-500">Manage and curate your projects</p>
+    </div>
+    <div class="hidden lg:flex mt-auto rounded-xs text-surface-low bg-surface-low px-4 py-2.5">
+      Create New Project
+    </div>
+  </div>
+  <div class="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+    <div class="rounded-md bg-white p-6 load-shadow">
+      <!-- Image -->
+      <div class="h-32 w-full animate-pulse rounded-sm bg-surface-low"></div>
+
+      <!-- Title -->
+      <div class="mt-4 h-6 w-3/4 animate-pulse rounded-xs bg-surface-low"></div>
+
+      <!-- Description -->
+      <div class="mt-4 h-4 w-1/2 animate-pulse rounded-xs bg-surface-low"></div>
+    </div>
+    }
+  </div>
+  } @else if (hasError()) {
+  <!-- Error state -->
+  <div class="flex flex-1 flex-col items-center justify-center px-4 text-center">
+    <div class="flex size-11 items-center justify-center rounded-lg bg-red-100">
+      <img src="assets/icons/cloud-off.svg" alt="" class="size-6" />
+    </div>
+
+    <h2 class="mt-4 text-base font-semibold text-slate-900">Something went wrong</h2>
+
+    <p class="mt-2 max-w-xs text-sm leading-5 text-slate-500">
+      We’re having trouble retrieving your projects right now. Please try again in a moment.
+    </p>
+
+    <button
+      type="button"
+      (click)="loadProjects()"
+      class="mt-5 rounded-xs bg-primary-gradient px-8 py-3 text-xs font-semibold text-white transition-all duration-200 ease-in-out hover:scale-[1.02]"
+    >
+      Retry Connection
+    </button>
+  </div>
+
+  } @else if (projects().length === 0) {
+  <!-- Empty state -->
+  <div class="flex flex-1 flex-col items-center justify-center px-4 text-center">
+    <div class="flex size-52 items-center justify-center">
+      <img src="assets/media/empty-projects.png" alt="" class="size-full object-contain" />
+    </div>
+
+    <h2 class="mt-7 text-2xl font-bold text-slate-900">No Projects</h2>
+
+    <p class="mt-2 max-w-md text-sm leading-6 text-slate-500">
+      You don’t have any projects yet. Start by defining your first architectural workspace to begin
+      tracking tasks and epics.
+    </p>
+
+    <a
+      routerLink="/projects/add"
+      class="mt-7 rounded-xs bg-primary-gradient px-6 py-3 text-sm font-semibold text-white transition-all duration-200 ease-in-out hover:scale-[1.02]"
+    >
+      Create New Project
+    </a>
+  </div>
+  } @else {
+  <!-- Projects state -->
   <!-- header section from before -->
   <div class="flex items-center justify-between">
     <div>
@@ -49,4 +119,5 @@
   <div class="mt-6 flex justify-center">
     <!-- your pagination component/markup here -->
   </div>
+  }
 </div>

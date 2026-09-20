@@ -4,8 +4,8 @@ import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
-import type { LoginModel } from '../models/login.model';
-import type { LoginResponse } from '../models/login-response.model';
+import type { LoginModel } from '../models/login';
+import type { LoginResponse } from '../models/login';
 import { StorageService } from '../../../core/services/storage.service';
 
 export interface LoginResult {
@@ -23,7 +23,6 @@ export class LoginService {
 
   private readonly loginEndpoint = `${environment.apiUrl}/auth/v1/token`;
   private readonly logoutEndpoint = `${environment.apiUrl}/auth/v1/logout`;
-  
 
   async login(data: LoginModel): Promise<LoginResult> {
     try {
@@ -58,15 +57,11 @@ export class LoginService {
   async logout(): Promise<LoginResult> {
     try {
       await firstValueFrom(
-        this.http.post<void>(
-          this.logoutEndpoint,
-          null,
-          {
-            headers: {
-              apikey: environment.apiKey,
-            },
+        this.http.post<void>(this.logoutEndpoint, null, {
+          headers: {
+            apikey: environment.apiKey,
           },
-        ),
+        }),
       );
 
       return {
@@ -77,6 +72,8 @@ export class LoginService {
         ok: false,
         message: this.getLogoutErrorMessage(error),
       };
+    } finally {
+      this.storageService.clearSession();
     }
   }
 

@@ -3,7 +3,7 @@ import { email, FormField, FormRoot, form, required } from '@angular/forms/signa
 import { RouterLink, Router } from '@angular/router';
 
 import { LoginService } from '../../services/login.service';
-import type { LoginModel } from '../../models/login.model';
+import type { LoginModel } from '../../models/login';
 
 @Component({
   selector: 'app-login',

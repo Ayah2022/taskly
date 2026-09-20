@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { StorageService } from './storage.service';
 
-import type { LoginResponse } from '../../features/auth/models/login-response.model';
+import type { LoginResponse } from '../../features/auth/models/login';
 
 @Injectable({
   providedIn: 'root',
@@ -20,10 +20,6 @@ export class TokenService {
     const refreshToken = this.storage.getRefreshToken();
 
     if (!refreshToken) {
-      return false;
-    }
-
-    if (this.storage.hasRememberMeExpired()) {
       this.storage.clearSession();
       return false;
     }

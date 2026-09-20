@@ -5,3 +5,12 @@ export interface SignupModel {
   password: string;
   confirmPassword: string;
 }
+
+export interface SignupRequest {
+  email: string;
+  password: string;
+  data: {
+    name: string;
+    job_title?: string;
+  };
+}

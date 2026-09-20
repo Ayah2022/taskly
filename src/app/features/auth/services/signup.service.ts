@@ -2,8 +2,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
-import type { SignupModel } from '../models/signup.model';
-import type { SignupRequest } from '../models/signup-request.model';
+import type { SignupModel } from '../models/signup';
+import type { SignupRequest } from '../models/signup';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({

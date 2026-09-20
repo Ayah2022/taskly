@@ -11,7 +11,7 @@ import {
 } from '@angular/forms/signals';
 
 import { SignupService } from '../../services/signup.service';
-import type { SignupModel } from '../../models/signup.model';
+import type { SignupModel } from '../../models/signup';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({
