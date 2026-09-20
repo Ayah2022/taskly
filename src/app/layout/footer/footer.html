@@ -1,0 +1,101 @@
+<footer class="fixed inset-x-0 bottom-0 z-40 lg:hidden">
+  <nav
+    class="flex h-16 items-center justify-center border-t border-slate-light bg-surface-low py-4 px-3"
+  >
+    <!-- Epics -->
+    @if (activeProjectId()) {
+    <a
+      [routerLink]="['/projects', activeProjectId(), 'epics']"
+      routerLinkActive="bg-surface-low"
+      #epicsRla="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      ariaCurrentWhenActive="page"
+      class="flex flex-col items-center gap-1 px-3 text-slate-medium"
+    >
+      @if (epicsRla.isActive) {
+      <img src="assets/icons/epics-primary.svg" alt="" class="size-5" />
+      } @else {
+      <img src="assets/icons/epics.svg" alt="" class="size-5" />
+      }
+
+      <span class="text-sm font-medium" [class.text-primary]="epicsRla.isActive">Epics</span>
+    </a>
+    }
+
+    <!-- Tasks -->
+    @if (activeProjectId()) {
+    <a
+      [routerLink]="['/projects', activeProjectId(), 'tasks']"
+      routerLinkActive="bg-surface-low"
+      #tasksRla="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      ariaCurrentWhenActive="page"
+      class="flex flex-col items-center gap-1 px-3 text-slate-medium"
+    >
+      @if (tasksRla.isActive) {
+      <img src="assets/icons/tasks-primary.svg" alt="" class="size-5" />
+      } @else {
+      <img src="assets/icons/tasks.svg" alt="" class="size-5" />
+      }
+
+      <span class="text-sm font-medium" [class.text-primary]="tasksRla.isActive">Tasks</span>
+    </a>
+
+    }
+
+    <!-- Projects -->
+    <a
+      routerLink="/projects"
+      routerLinkActive="text-primary"
+      #projectsRla="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      ariaCurrentWhenActive="page"
+      class="flex flex-col items-center gap-1 px-3 text-slate-medium"
+    >
+      @if (projectsRla.isActive) {
+      <img src="assets/icons/folder-active.svg" alt="" class="size-5" />
+      } @else {
+      <img src="assets/icons/folder.svg" alt="" class="size-5" />
+      }
+
+      <span class="text-sm font-medium" [class.text-primary]="projectsRla.isActive">Projects</span>
+    </a>
+
+    <!-- Members -->
+    @if (activeProjectId()) {
+    <a
+      [routerLink]="['/projects', activeProjectId(), 'members']"
+      routerLinkActive="bg-surface-low"
+      #membersRla="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      ariaCurrentWhenActive="page"
+      class="flex flex-col items-center gap-1 px-3 text-slate-medium"
+    >
+      @if (membersRla.isActive) {
+      <img src="assets/icons/members-primary.svg" alt="" class="size-5" />
+      } @else {
+      <img src="assets/icons/members.svg" alt="" class="size-5" />
+      }
+
+      <span class="text-sm font-medium" [class.text-primary]="membersRla.isActive">Members</span>
+    </a>
+    }
+
+    <!-- Details -->
+    @if (activeProjectId()) {
+    <a
+      [routerLink]="['/projects', activeProjectId(), 'edit']"
+      routerLinkActive="bg-surface-low"
+      #detailsRla="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      ariaCurrentWhenActive="page"
+      class="flex flex-col items-center gap-1 px-3 text-slate-medium"
+    >
+      <!-- Same icon in both states -->
+      <img src="assets/icons/details.svg" alt="" class="size-5" />
+
+      <span class="text-sm font-medium" [class.text-primary]="detailsRla.isActive">Details</span>
+    </a>
+    }
+  </nav>
+</footer>

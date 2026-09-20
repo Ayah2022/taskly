@@ -1,4 +1,4 @@
-import { Component, input, output, signal, inject } from '@angular/core';
+import { Component, input, output, signal, inject, OnInit } from '@angular/core';
 import {
   RouterLink,
   RouterLinkActive,
@@ -9,14 +9,14 @@ import {
 import { LoginService } from '../../features/auth/services/login.service';
 import { filter } from 'rxjs';
 import { ProjectModel } from '../../features/projects/models/project.model';
-
+import { SlicePipe } from '@angular/common';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, SlicePipe],
   templateUrl: './sidebar.html',
 })
-export class Sidebar {
+export class Sidebar implements OnInit {
   isLoggingOut = false;
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -30,13 +30,20 @@ export class Sidebar {
   readonly activeProjectId = signal<string | null>(null);
   readonly activeProjectName = signal<string | null>(null);
 
-  constructor() {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      const project = this.getActiveProject();
+  ngOnInit() {
+    // Get the project immediately on page load / refresh
+    this.updateActiveProject();
 
-      this.activeProjectId.set(project?.id ?? null);
-      this.activeProjectName.set(project?.name ?? null);
+    // Update it whenever navigation happens
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+      this.updateActiveProject();
     });
+  }
+  private updateActiveProject(): void {
+    const project = this.getActiveProject();
+
+    this.activeProjectId.set(project?.id ?? null);
+    this.activeProjectName.set(project?.name ?? null);
   }
 
   private getActiveProject(): ProjectModel | null {

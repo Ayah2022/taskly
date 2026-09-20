@@ -30,24 +30,34 @@ export const PROJECTS_ROUTES: Routes = [
       breadcrumb: 'project',
     },
     children: [
-      // /projects/:projectId
+      // /projects/:projectId → /projects/:projectId/epics
       {
         path: '',
+        pathMatch: 'full',
+        redirectTo: 'epics',
+      },
+      // /projects/:projectId/epics
+      {
+        path: 'epics',
+        loadComponent: () =>
+          import('./pages/project-epics/project-epics').then((component) => component.ProjectEpics),
+
+        data: {
+          breadcrumb: 'Epics',
+        },
+      },
+
+      // /projects/:projectId/edit
+      {
+        path: 'edit',
         loadComponent: () =>
           import('./pages/project-details/project-details').then(
             (component) => component.ProjectDetails,
           ),
+        data: {
+          breadcrumb: 'Edit',
+        },
       },
-
-      // /projects/:projectId/edit
-      // {
-      //   path: 'edit',
-      //   loadComponent: () =>
-      //     import('./pages/edit-project/edit-project').then((component) => component.EditProject),
-      //   data: {
-      //     breadcrumb: 'Edit',
-      //   },
-      // },
 
       // /projects/:projectId/tasks
       // {

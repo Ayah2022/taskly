@@ -1,7 +1,7 @@
 // projects.service.ts
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom, from, Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import type { ProjectModel } from '../models/project.model';
@@ -43,11 +43,24 @@ export class ProjectsService {
     );
   }
 
+  // getProject(projectId: string): Observable<ProjectModel> {
+  //   return this.http.get<ProjectModel>(`${this.endpoint}/${projectId}`, {
+  //     headers: {
+  //       apikey: environment.apiKey,
+  //     },
+  //   });
+  // }
   getProject(projectId: string): Observable<ProjectModel> {
-    return this.http.get<ProjectModel>(`${this.endpoint}/${projectId}`, {
-      headers: {
-        apikey: environment.apiKey,
-      },
-    });
+    return from(
+      this.getProjects().then((projects) => {
+        const project = projects.find((project) => project.id === projectId);
+
+        if (!project) {
+          throw new Error('Project not found.');
+        }
+
+        return project;
+      }),
+    );
   }
 }

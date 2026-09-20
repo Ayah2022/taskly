@@ -1,7 +1,7 @@
 <aside
   [class.w-64]="!sidebarCollapsed()"
   [class.w-20]="sidebarCollapsed()"
-  class="hidden lg:flex h-screen shrink-0 flex-col items-start px-4 py-4 transition-all ease-in"
+  class="hidden lg:flex overflow-y-auto overscroll-contain h-screen shrink-0 flex-col items-start px-4 py-4 transition-all ease-in"
 >
   <!-- Server error -->
   @if (logoutError()) {
@@ -31,6 +31,7 @@
         <a
           routerLink="/projects"
           routerLinkActive="bg-white text-primary"
+          [routerLinkActiveOptions]="{ exact: true }"
           #rla="routerLinkActive"
           class="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-slate-dark transition"
         >
@@ -70,7 +71,7 @@
 
   <!-- Active project dropdown -->
   @if (activeProjectId()) {
-  <div class="relative py-4">
+  <div class="relative py-4 w-full">
     <button
       type="button"
       class="flex h-12 items-center justify-between gap-3 px-3 transition ease-out"
@@ -85,19 +86,22 @@
       [class.bg-white]="sidebarCollapsed()"
       (click)="toggleActiveProject()"
     >
-      <span [class.hidden]="sidebarCollapsed()" class="flex items-center justify-center">
-        <img class="size-5 shrink-0" src="assets/icons/file.svg" alt="" />
-      </span>
-      <span [class.hidden]="!sidebarCollapsed()" class="flex items-center justify-center">
-        <img class="size-5 shrink-0" src="assets/icons/file-active.svg" alt="" />
-      </span>
+      <div class="flex items-center gap-3">
+        <span [class.hidden]="sidebarCollapsed()" class="flex items-center justify-center">
+          <img class="size-5 shrink-0" src="assets/icons/file.svg" alt="" />
+        </span>
+        <span [class.hidden]="!sidebarCollapsed()" class="flex items-center justify-center">
+          <img class="size-5 shrink-0" src="assets/icons/file-active.svg" alt="" />
+        </span>
 
-      <span
-        [class.hidden]="sidebarCollapsed()"
-        class="truncate text-sm font-semibold text-slate-dark"
-      >
-        Active Project Name
-      </span>
+        <span
+          [class.hidden]="sidebarCollapsed()"
+          class="truncate text-sm font-semibold text-slate-dark"
+        >
+          {{ activeProjectName()!.length > 18 ? (activeProjectName() | slice: 0 : 18) + '...' :
+          activeProjectName() }}
+        </span>
+      </div>
 
       <span class="px-1 py-2" [class.hidden]="sidebarCollapsed()">
         <img
@@ -124,21 +128,52 @@
       [class.w-48]="sidebarCollapsed()"
       [class.z-20]="sidebarCollapsed()"
     >
-      <a class="flex items-center justify-start gap-2 px-4 py-3" href="#">
-        <span class="flex h-full size-5"><img src="assets/icons/epics.svg" alt="image" /></span
-        ><span>Epics</span>
+      <a
+        [routerLink]="['/projects',activeProjectId(), 'epics']"
+        routerLinkActive="bg-surface-low rounded-4xl"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center justify-start gap-2 px-4 py-3"
+      >
+        <span class="flex size-5">
+          <img src="assets/icons/epics.svg" alt="" />
+        </span>
+        <span>Epics</span>
       </a>
-      <a class="flex items-center justify-start gap-2 px-4 py-3" href="#">
-        <span class="flex h-full size-5"><img src="assets/icons/tasks.svg" alt="image" /></span
-        ><span>Tasks</span>
+
+      <a
+        [routerLink]="['/projects',activeProjectId(), 'tasks']"
+        routerLinkActive="bg-surface-low rounded-4xl"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center justify-start gap-2 px-4 py-3"
+      >
+        <span class="flex size-5">
+          <img src="assets/icons/tasks.svg" alt="" />
+        </span>
+        <span>Tasks</span>
       </a>
-      <a class="flex items-center justify-start gap-2 px-4 py-3" href="#">
-        <span class="flex h-full size-5"><img src="assets/icons/members.svg" alt="image" /></span
-        ><span>Members</span>
+
+      <a
+        [routerLink]="['/projects',activeProjectId(), 'members']"
+        routerLinkActive="bg-surface-low rounded-4xl"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center justify-start gap-2 px-4 py-3"
+      >
+        <span class="flex size-5">
+          <img src="assets/icons/members.svg" alt="" />
+        </span>
+        <span>Members</span>
       </a>
-      <a class="flex items-center justify-start gap-2 px-4 py-3" href="#">
-        <span class="flex h-full size-5"><img src="assets/icons/details.svg" alt="image" /></span
-        ><span>Details</span>
+
+      <a
+        [routerLink]="['/projects',activeProjectId(), 'edit']"
+        routerLinkActive="bg-surface-low rounded-4xl"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center justify-start gap-2 px-4 py-3"
+      >
+        <span class="flex size-5">
+          <img src="assets/icons/details.svg" alt="" />
+        </span>
+        <span>Details</span>
       </a>
     </div>
     }
@@ -174,7 +209,7 @@
 
 <!-- Mobile Sidebar -->
 <aside
-  class="fixed inset-0 z-50 flex h-screen w-full flex-col px-6 py-4 lg:hidden bg-surface-low"
+  class="fixed overflow-y-auto overscroll-contain inset-0 z-50 flex h-screen w-full flex-col px-6 py-4 lg:hidden bg-surface-low"
   [class.hidden]="!mobileMenuOpen()"
 >
   <!-- mobile sidebar content -->
@@ -240,6 +275,7 @@
   </nav>
 
   <!-- Active project dropdown -->
+  @if (activeProjectId()) {
   <div class="py-4">
     <button
       type="button"
@@ -247,15 +283,22 @@
       [class.rounded-b-none]="activeProjectExpanded()"
       (click)="toggleActiveProject()"
     >
-      <span class="flex justify-start items-center gap-3">
-        <img src="assets/icons/file.svg" alt="" class="size-5 shrink-0" />
+      <div class="flex items-center gap-3">
+        <span [class.hidden]="sidebarCollapsed()" class="flex items-center justify-center">
+          <img class="size-5 shrink-0" src="assets/icons/file.svg" alt="" />
+        </span>
+        <span [class.hidden]="!sidebarCollapsed()" class="flex items-center justify-center">
+          <img class="size-5 shrink-0" src="assets/icons/file-active.svg" alt="" />
+        </span>
+
         <span
           [class.hidden]="sidebarCollapsed()"
           class="truncate text-sm font-semibold text-slate-dark"
         >
-          Active Project Name
+          {{ activeProjectName()!.length > 18 ? (activeProjectName() | slice: 0 : 18) + '...' :
+          activeProjectName() }}
         </span>
-      </span>
+      </div>
 
       <span class="py-2 px-1" [class.hidden]="sidebarCollapsed()">
         <img
@@ -271,28 +314,58 @@
       class="bg-white flex flex-col justify-center p-2 rounded-b-md"
       [class.hidden]="sidebarCollapsed()"
     >
-      <a class="flex py-3 px-4 gap-2 justify-start items-center" href="#"
-        ><span class="size-5 flex h-full"><img src="assets/icons/epics.svg" alt="image" /></span
-        ><span> Epics </span></a
+      <a
+        [routerLink]="['/projects',activeProjectId(), 'epics']"
+        routerLinkActive="bg-surface-low rounded-4xl"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center justify-start gap-2 px-4 py-3"
       >
-
-      <a class="flex py-3 px-4 gap-2 justify-start items-center" href="#"
-        ><span class="size-5 flex h-full"><img src="assets/icons/tasks.svg" alt="image" /></span
-        ><span> Tasks </span></a
-      >
-
-      <a class="flex py-3 px-4 gap-2 justify-start items-center" href="#"
-        ><span class="size-5 flex h-full"><img src="assets/icons/members.svg" alt="image" /></span
-        ><span> Members</span>
+        <span class="flex size-5">
+          <img src="assets/icons/epics.svg" alt="" />
+        </span>
+        <span>Epics</span>
       </a>
 
-      <a class="flex py-3 px-4 gap-2 justify-start items-center" href="#"
-        ><span class="size-5 flex h-full"><img src="assets/icons/details.svg" alt="image" /></span
-        ><span> Details</span></a
+      <a
+        [routerLink]="['/projects',activeProjectId(), 'tasks']"
+        routerLinkActive="bg-surface-low rounded-4xl"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center justify-start gap-2 px-4 py-3"
       >
+        <span class="flex size-5">
+          <img src="assets/icons/tasks.svg" alt="" />
+        </span>
+        <span>Tasks</span>
+      </a>
+
+      <a
+        [routerLink]="['/projects',activeProjectId(), 'members']"
+        routerLinkActive="bg-surface-low rounded-4xl"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center justify-start gap-2 px-4 py-3"
+      >
+        <span class="flex size-5">
+          <img src="assets/icons/members.svg" alt="" />
+        </span>
+        <span>Members</span>
+      </a>
+
+      <a
+        [routerLink]="['/projects',activeProjectId(), 'edit']"
+        routerLinkActive="bg-surface-low rounded-4xl"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center justify-start gap-2 px-4 py-3"
+      >
+        <span class="flex size-5">
+          <img src="assets/icons/details.svg" alt="" />
+        </span>
+        <span>Details</span>
+      </a>
     </div>
     }
   </div>
+  }
+
   <!-- Bottom navigation -->
   <div class="mt-auto w-full border-t border-slate-light pt-6">
     <!-- Logout -->
