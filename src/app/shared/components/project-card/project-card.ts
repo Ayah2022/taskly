@@ -1,12 +1,13 @@
 // project-card.component.ts
 import { Component, input } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-project-card',
   standalone: true,
   templateUrl: './project-card.html',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, SlicePipe],
 })
 export class ProjectCard {
   readonly id = input.required<string>();

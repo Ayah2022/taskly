@@ -7,7 +7,8 @@
         [routerLink]="breadcrumb.url"
         class="label-breadcrumb transition hover:text-primary-container"
       >
-        {{ breadcrumb.label }}
+        {{ breadcrumb.label.length > 18 ? (breadcrumb.label | slice: 0 : 18) + '...' :
+        breadcrumb.label }}
       </a>
 
       <span class="size-2">
