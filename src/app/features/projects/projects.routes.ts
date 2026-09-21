@@ -60,68 +60,40 @@ export const PROJECTS_ROUTES: Routes = [
       },
 
       // /projects/:projectId/tasks
-      // {
-      //   path: 'tasks',
-      //   loadComponent: () =>
-      //     import('./pages/tasks/tasks').then(
-      //       (component) => component.Tasks,
-      //     ),
-      //   data: {
-      //     breadcrumb: 'Tasks',
-      //   },
+      {
+        path: 'tasks',
+        loadComponent: () =>
+          import('./pages/project-tasks/project-tasks').then((component) => component.ProjectTasks),
+        data: {
+          breadcrumb: 'Tasks',
+        },
 
-      //   children: [
-      //     // /projects/:projectId/tasks/add
-      //     {
-      //       path: 'add',
-      //       loadComponent: () =>
-      //         import('./pages/add-task/add-task').then(
-      //           (component) => component.AddTask,
-      //         ),
-      //       data: {
-      //         breadcrumb: 'New Task',
-      //       },
-      //     },
-      //   ],
-      // },
+        //   children: [
+        //     // /projects/:projectId/tasks/add
+        //     {
+        //       path: 'add',
+        //       loadComponent: () =>
+        //         import('./pages/add-task/add-task').then(
+        //           (component) => component.AddTask,
+        //         ),
+        //       data: {
+        //         breadcrumb: 'New Task',
+        //       },
+        //     },
+        //   ],
+      },
 
-      // // /projects/:projectId/epics
-      // {
-      //   path: 'epics',
-      //   loadComponent: () =>
-      //     import('./pages/epics/epics').then(
-      //       (component) => component.Epics,
-      //     ),
-      //   data: {
-      //     breadcrumb: 'Epics',
-      //   },
-
-      //   children: [
-      //     // /projects/:projectId/epics/add
-      //     {
-      //       path: 'add',
-      //       loadComponent: () =>
-      //         import('./pages/add-epic/add-epic').then(
-      //           (component) => component.AddEpic,
-      //         ),
-      //       data: {
-      //         breadcrumb: 'New Epic',
-      //       },
-      //     },
-      //   ],
-      // },
-
-      // // /projects/:projectId/members
-      // {
-      //   path: 'members',
-      //   loadComponent: () =>
-      //     import('./pages/members/members').then(
-      //       (component) => component.Members,
-      //     ),
-      //   data: {
-      //     breadcrumb: 'Members',
-      //   },
-      // },
+      // /projects/:projectId/members
+      {
+        path: 'members',
+        loadComponent: () =>
+          import('./pages/project-members/project-members').then(
+            (component) => component.ProjectMembers,
+          ),
+        data: {
+          breadcrumb: 'Members',
+        },
+      },
     ],
   },
 ];
