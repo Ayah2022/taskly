@@ -1,7 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, DestroyRef, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
-
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 interface BreadcrumbItem {
   label: string;
   url: string;
@@ -13,16 +13,26 @@ interface BreadcrumbItem {
   imports: [RouterLink],
   templateUrl: './breadcrumb.html',
 })
-export class Breadcrumb {
+export class Breadcrumb implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
   readonly breadcrumbs = signal<BreadcrumbItem[]>([]);
 
-  constructor() {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      this.breadcrumbs.set(this.buildBreadcrumbs());
-    });
+  ngOnInit(): void {
+    this.listenToRouterEvents();
+  }
+
+  private listenToRouterEvents(): void {
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => {
+        this.breadcrumbs.set(this.buildBreadcrumbs());
+      });
   }
 
   private buildBreadcrumbs(): BreadcrumbItem[] {

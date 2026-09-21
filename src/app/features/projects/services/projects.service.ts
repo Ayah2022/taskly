@@ -1,7 +1,7 @@
 // projects.service.ts
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { firstValueFrom, from, Observable } from 'rxjs';
+import { firstValueFrom, map, Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import type { ProjectModel } from '../models/project.model';
@@ -43,24 +43,52 @@ export class ProjectsService {
     );
   }
 
-  // getProject(projectId: string): Observable<ProjectModel> {
-  //   return this.http.get<ProjectModel>(`${this.endpoint}/${projectId}`, {
-  //     headers: {
-  //       apikey: environment.apiKey,
-  //     },
-  //   });
-  // }
   getProject(projectId: string): Observable<ProjectModel> {
-    return from(
-      this.getProjects().then((projects) => {
-        const project = projects.find((project) => project.id === projectId);
+    return this.http
+      .get<ProjectModel[]>(`${this.projectsEndpoint}?id=eq.${projectId}`, {
+        headers: {
+          apikey: environment.apiKey,
+        },
+      })
+      .pipe(
+        map((projects) => {
+          const project = projects[0];
 
-        if (!project) {
-          throw new Error('Project not found.');
-        }
+          if (!project) {
+            throw new Error('Project not found.');
+          }
 
-        return project;
-      }),
+          return project;
+        }),
+      );
+  }
+
+  async updateProject(
+    projectId: string,
+    payload: {
+      name: string;
+      description: string;
+    },
+  ): Promise<ProjectModel> {
+    const projects = await firstValueFrom(
+      this.http.patch<ProjectModel[]>(
+        `${this.projectsEndpoint}?id=eq.${encodeURIComponent(projectId)}`,
+        payload,
+        {
+          headers: {
+            apikey: environment.apiKey,
+            Prefer: 'return=representation',
+          },
+        },
+      ),
     );
+
+    const project = projects[0];
+
+    if (!project) {
+      throw new Error('Project not found.');
+    }
+
+    return project;
   }
 }
