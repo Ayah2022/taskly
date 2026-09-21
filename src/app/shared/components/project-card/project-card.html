@@ -8,21 +8,38 @@
 
   <p class="mt-2 line-clamp-3 text-sm text-slate-500">{{ description() }}</p>
 
-  <div class="mt-auto mb-2 flex items-center gap-6">
-    <span class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary">
-      <img src="assets/icons/epics-primary.svg" alt="" class="size-5" />
+  <div class="mt-auto pt-4 pb-3 flex items-center gap-4">
+    <a
+      [routerLink]="['/projects', id(), 'epics']"
+      class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
+    >
+      <img src="assets/icons/epics-primary.svg" alt="" class="size-4.5" />
       Epics
-    </span>
+    </a>
 
-    <span class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary">
-      <img src="assets/icons/tasks-primary.svg" alt="" class="size-5" />
+    <a
+      [routerLink]="['/projects', id(), 'tasks']"
+      class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
+    >
+      <img src="assets/icons/tasks-primary.svg" alt="" class="size-4.5" />
       Tasks
-    </span>
+    </a>
 
-    <span class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary">
-      <img src="assets/icons/members-primary.svg" alt="" class="size-5" />
+    <a
+      [routerLink]="['/projects', id(), 'members']"
+      class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
+    >
+      <img src="assets/icons/members-primary.svg" alt="" class="size-4.5" />
       Members
-    </span>
+    </a>
+
+    <a
+      [routerLink]="['/projects', id(), 'edit']"
+      class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
+    >
+      <img src="assets/icons/details.svg" alt="" class="size-4.5" />
+      Details
+    </a>
   </div>
 
   <div class="mt-auto flex items-center justify-between border-t border-slate-100 pt-3">
