@@ -21,18 +21,13 @@ export class StorageService {
       rememberMeExpiresAt: rememberMe ? Date.now() + 30 * 24 * 60 * 60 * 1000 : null,
     };
 
+    // Make sure an old session cannot remain in the other storage.
+    localStorage.removeItem(this.sessionKey);
+    sessionStorage.removeItem(this.sessionKey);
+
     const storage = rememberMe ? localStorage : sessionStorage;
 
     storage.setItem(this.sessionKey, JSON.stringify(storedSession));
-  }
-  hasRememberMeExpired(): boolean {
-    const stored = this.getStoredSession();
-
-    if (!stored?.rememberMe || !stored.rememberMeExpiresAt) {
-      return false;
-    }
-
-    return Date.now() >= stored.rememberMeExpiresAt;
   }
 
   getStoredSession(): StoredSession | null {
@@ -64,6 +59,16 @@ export class StorageService {
 
   isRememberMe(): boolean {
     return this.getStoredSession()?.rememberMe ?? false;
+  }
+
+  hasRememberMeExpired(): boolean {
+    const stored = this.getStoredSession();
+
+    if (!stored?.rememberMe || !stored.rememberMeExpiresAt) {
+      return false;
+    }
+
+    return Date.now() >= stored.rememberMeExpiresAt;
   }
 
   updateSession(session: LoginResponse): void {

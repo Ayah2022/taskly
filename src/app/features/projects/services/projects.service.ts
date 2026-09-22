@@ -33,14 +33,22 @@ export class ProjectsService {
   }
 
   async createProject(payload: CreateProjectPayload): Promise<ProjectModel> {
-    return firstValueFrom(
-      this.http.post<ProjectModel>(this.projectsEndpoint, payload, {
+    const projects = await firstValueFrom(
+      this.http.post<ProjectModel[]>(this.projectsEndpoint, payload, {
         headers: {
           apikey: environment.apiKey,
           Prefer: 'return=representation',
         },
       }),
     );
+
+    const project = projects[0];
+
+    if (!project) {
+      throw new Error('Project was not created.');
+    }
+
+    return project;
   }
 
   getProject(projectId: string): Observable<ProjectModel> {

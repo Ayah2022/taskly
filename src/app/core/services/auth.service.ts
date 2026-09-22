@@ -17,26 +17,24 @@ export class AuthService {
   async restoreSession(): Promise<boolean> {
     const session = this.storage.getSession();
 
+    // No stored session.
     if (!session) {
       return false;
     }
 
+    // Remember-me period has ended.
     if (this.storage.hasRememberMeExpired()) {
       this.storage.clearSession();
       return false;
     }
+
     // Access token is still valid.
     if (!this.isTokenExpired(session.expires_at)) {
       return true;
     }
 
     // Access token expired.
-    // Only a remembered session should be restored.
-    if (!this.storage.isRememberMe()) {
-      this.storage.clearSession();
-      return false;
-    }
-
+    // Try to get a new access token using the refresh token.
     return this.tokenService.refreshToken();
   }
 

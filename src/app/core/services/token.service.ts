@@ -43,7 +43,9 @@ export class TokenService {
       this.storage.updateSession(session);
 
       return true;
-    } catch {
+    } catch (error) {
+      console.error('Failed to refresh access token:', error);
+
       this.storage.clearSession();
 
       return false;
