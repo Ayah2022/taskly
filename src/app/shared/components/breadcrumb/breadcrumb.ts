@@ -1,5 +1,5 @@
 import { Component, inject, DestroyRef, signal, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
 import { SlicePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -17,11 +17,14 @@ interface BreadcrumbItem {
 export class Breadcrumb implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
 
   readonly breadcrumbs = signal<BreadcrumbItem[]>([]);
 
   ngOnInit(): void {
+    // Build immediately for the current URL.
+    this.breadcrumbs.set(this.buildBreadcrumbs());
+
+    // Rebuild whenever navigation finishes.
     this.listenToRouterEvents();
   }
 
@@ -39,7 +42,7 @@ export class Breadcrumb implements OnInit {
   private buildBreadcrumbs(): BreadcrumbItem[] {
     const breadcrumbs: BreadcrumbItem[] = [];
 
-    let route = this.route;
+    let route = this.router.routerState.root;
     let url = '';
 
     while (route.firstChild) {

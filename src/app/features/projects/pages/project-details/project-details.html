@@ -44,12 +44,19 @@
 
         @if (projectForm.name().touched() && projectForm.name().invalid()) { @for (error of
         projectForm.name().errors(); track error.kind) { @if (error.kind === 'required') {
-        <p class="text-xs font-medium text-error">Project Title is required.</p>
+        <p class="text-xs font-medium text-error">
+          <span><img src="assets/icons/details-danger.svg" class="size-4" alt="" /></span>Project
+          Title is required.
+        </p>
         } @if (error.kind === 'minLength') {
-        <p class="text-xs font-medium text-error">Project Title must be at least 3 characters.</p>
+        <p class="text-xs font-medium text-error">
+          <span><img src="assets/icons/details-danger.svg" class="size-4" alt="" /></span>Project
+          Title must be at least 3 characters.
+        </p>
         }
         <!-- @if (error.kind === 'maxLength') {
-        <p class="text-xs font-medium text-error">Project Title must not exceed 100 characters.</p>
+        <p class="text-xs font-medium text-error">
+          <span><img src="assets/icons/details-danger.svg" class="size-4" alt=""></span>Project Title must not exceed 100 characters.</p>
         }  -->
         } }
       </div>
@@ -81,7 +88,10 @@
         @if (projectForm.description().touched() && projectForm.description().invalid()) { @for
         (error of projectForm.description().errors(); track error.kind) { @if (error.kind ===
         'maxLength') {
-        <p class="text-xs font-medium text-error">Description must not exceed 500 characters.</p>
+        <p class="text-xs font-medium text-error">
+          <span><img src="assets/icons/details-danger.svg" class="size-4" alt="" /></span
+          >Description must not exceed 500 characters.
+        </p>
         } } }
       </div>
 

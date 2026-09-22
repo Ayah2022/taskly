@@ -3,7 +3,6 @@ import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-import { AuthService } from '../../../core/services/auth.service';
 import type { LoginModel } from '../models/login';
 import type { LoginResponse } from '../models/login';
 import { StorageService } from '../../../core/services/storage.service';
@@ -18,7 +17,6 @@ export interface LoginResult {
 })
 export class LoginService {
   private readonly http = inject(HttpClient);
-  private readonly authService = inject(AuthService);
   private readonly storageService = inject(StorageService);
 
   private readonly loginEndpoint = `${environment.apiUrl}/auth/v1/token`;
