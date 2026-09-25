@@ -1,0 +1,1 @@
+import{En as xa,i as Aa,nt as Tv,xn as vy}from"./chunk-DFnuQYdq.js";var n=class t{static ɵfac=function(e){return new(e||t)};static ɵcmp=vy({type:t,selectors:[[`app-project-members`]],decls:2,vars:0,template:function(e,c){e&1&&(xa(0,`p`),Tv(1,`project-members works!`),Aa())},encapsulation:2})};export{n as ProjectMembers};

@@ -1,0 +1,1 @@
+import{En as xa,i as Aa,nt as Tv,xn as vy}from"./chunk-DFnuQYdq.js";var i=class t{static ɵfac=function(e){return new(e||t)};static ɵcmp=vy({type:t,selectors:[[`app-project-epics`]],decls:2,vars:0,template:function(e,r){e&1&&(xa(0,`p`),Tv(1,`project-epics works!`),Aa())},encapsulation:2})};export{i as ProjectEpics};
