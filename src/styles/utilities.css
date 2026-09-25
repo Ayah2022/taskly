@@ -67,6 +67,16 @@ select {
     letter-spacing: -0.6px;
     font-weight: 600;
   }
+.form-width {
+width: 45%;
+  max-width: 576px;
+  @media (max-width: 1200px) {
+      width: 60%;
+  }
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+}
 
   @media (max-width: 767px) {
     .display-lg {

@@ -39,6 +39,7 @@ export class LoginService {
           },
         ),
       );
+      console.log("remember me", data ,data.rememberMe);
       this.storageService.setSession(session, data.rememberMe);
 
       return {
