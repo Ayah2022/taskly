@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 
 import type { LoginResponse } from '../../features/auth/models/login';
-import { Login } from '../../features/auth/pages/login/login';
-import { LoginService } from '../../features/auth/services/login.service';
 
 interface StoredSession {
   session: LoginResponse;
@@ -17,7 +15,6 @@ export class StorageService {
   private readonly sessionKey = 'taskly_session';
 
   setSession(session: LoginResponse, rememberMe: boolean): void {
-   
     const storedSession: StoredSession = {
       session,
       rememberMe,
@@ -84,7 +81,6 @@ export class StorageService {
       ...stored,
       session,
     };
-
 
     const storage = stored.rememberMe ? localStorage : sessionStorage;
 
