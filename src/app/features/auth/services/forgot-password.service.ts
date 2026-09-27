@@ -24,15 +24,20 @@ export class ForgotPasswordService {
 
   async sendResetLink(email: string): Promise<void> {
     const payload: ForgotPasswordPayload = { email };
-    const redirectTo = `${window.location.origin}/reset-password`;
+
+    const redirectTo = environment.authRedirectUrl;
 
     await firstValueFrom(
-      this.http.post<void>(`${this.recoverEndpoint}?redirect_to=${encodeURIComponent(redirectTo)}`, payload, {
-        headers: {
-          apikey: environment.apiKey,
-          'Content-Type': 'application/json',
+      this.http.post<void>(
+        `${this.recoverEndpoint}?redirect_to=${encodeURIComponent(redirectTo)}`,
+        payload,
+        {
+          headers: {
+            apikey: environment.apiKey,
+            'Content-Type': 'application/json',
+          },
         },
-      }),
+      ),
     );
   }
 
