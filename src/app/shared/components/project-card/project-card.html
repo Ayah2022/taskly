@@ -1,7 +1,13 @@
-<a
-  [routerLink]="['/projects', id(), 'epics']"
-  class="flex h-full w-full flex-col rounded-lg border border-slate-200 bg-white p-5 transition hover:border-primary hover:shadow-sm"
+<div
+  class="relative flex h-full w-full flex-col rounded-lg border border-slate-200 bg-white p-5 transition hover:border-primary hover:shadow-sm"
 >
+  <!-- Stretched link: covers the whole card, but sits BEHIND the action row -->
+
+  <a
+    [routerLink]="['/projects', id(), 'epics']"
+    class="absolute inset-0 z-0"
+    [attr.aria-label]="name()"
+  ></a>
   <h3 class="text-lg font-bold text-slate-900">
     {{ name().length > 26 ? (name() | slice: 0 : 26) + '...' : name() }}
   </h3>
@@ -11,7 +17,7 @@
   <div class="mt-auto pt-4 pb-3 flex items-center gap-4">
     <a
       [routerLink]="['/projects', id(), 'epics']"
-      class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
+      class="relative z-10 flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
     >
       <img src="assets/icons/epics-primary.svg" alt="" class="size-4.5" />
       Epics
@@ -19,7 +25,7 @@
 
     <a
       [routerLink]="['/projects', id(), 'tasks']"
-      class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
+      class="relative z-10 flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
     >
       <img src="assets/icons/tasks-primary.svg" alt="" class="size-4.5" />
       Tasks
@@ -27,7 +33,7 @@
 
     <a
       [routerLink]="['/projects', id(), 'members']"
-      class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
+      class="relative z-10 flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
     >
       <img src="assets/icons/members-primary.svg" alt="" class="size-4.5" />
       Members
@@ -35,7 +41,7 @@
 
     <a
       [routerLink]="['/projects', id(), 'edit']"
-      class="flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
+      class="relative z-10 flex items-center gap-1.5 text-xxs font-semibold leading-4 text-primary"
     >
       <img src="assets/icons/details.svg" alt="" class="size-4.5" />
       Details
@@ -47,4 +53,4 @@
 
     <span class="text-xs font-semibold text-slate-600"> {{ createdAt() | date: 'd MMM y' }} </span>
   </div>
-</a>
+</div>
