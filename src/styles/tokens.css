@@ -6,6 +6,7 @@
   /* Action Blue */
   --primary: #003d9b;
   --primary-container: #0052cc;
+  --primary-light: #dae2ff;
 
   /* Primary gradient */
   --primary-gradient: linear-gradient(135deg, #003d9b 0%, #0052cc 100%);
@@ -28,8 +29,9 @@
 
   /* other colors */
   --gray-medium: #434654;
+  --gray-dark: #51617e;
   --green-dark: #004e32;
-  --pale-green:#00523599;
+  --pale-green: #00523599;
   /* === TYPOGRAPHY TOKENS === */
 
   --font-family:

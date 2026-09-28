@@ -1,1 +1,166 @@
-<p>project-members works!</p>
+<div class="p-6">
+  @if (isLoading()) {
+  <!-- Loading state -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Project Members</h1>
+    </div>
+    <div class="hidden lg:flex mt-auto rounded-xs text-surface-low bg-surface-low px-4 py-2.5">
+      Invite Members
+    </div>
+  </div>
+  <!-- Members table skeleton -->
+  <div class="mx-auto mt-10 max-w-[580px] overflow-hidden rounded-lg bg-white shadow-sm">
+    <!-- Table header -->
+    <div class="grid grid-cols-[1fr_140px] border-b border-slate-100 px-8 py-5">
+      <div class="h-3 w-20 animate-pulse rounded-xs bg-surface-low"></div>
+
+      <div class="h-3 w-20 animate-pulse rounded-xs bg-surface-low"></div>
+    </div>
+
+    <!-- Rows -->
+    @for (item of [1, 2, 3, 4, 5]; track item) {
+    <div
+      class="grid grid-cols-[1fr_140px] items-center border-b border-slate-100 px-8 py-5 last:border-b-0"
+    >
+      <!-- Member -->
+      <div class="flex items-center gap-4">
+        <div class="size-12 animate-pulse rounded-xl bg-surface-low"></div>
+
+        <div class="space-y-2">
+          <div class="h-4 w-32 animate-pulse rounded-xs bg-surface-low"></div>
+
+          <div class="h-3 w-40 animate-pulse rounded-xs bg-surface-low"></div>
+        </div>
+      </div>
+
+      <!-- Role -->
+      <div class="h-5 w-24 animate-pulse rounded-full bg-surface-low"></div>
+    </div>
+    }
+  </div>
+  } @else if (hasError()) {
+  <!-- Error state -->
+
+  <div
+    class="flex min-h-[calc(100vh-120px)] flex-1 flex-col items-center justify-center px-4 text-center"
+  >
+    <div class="flex size-16 items-center justify-center rounded-xl bg-red-100">
+      <img src="assets/icons/cloud-off.svg" alt="" class="size-8" />
+    </div>
+
+    <h2 class="mt-6 text-xl font-semibold text-slate-900">Something went wrong</h2>
+
+    <p class="mt-3 max-w-xs text-sm leading-6 text-slate-500">
+      We're having trouble retrieving your project members right now. Please try again in a moment.
+    </p>
+
+    <button
+      type="button"
+      (click)="loadProjectMembers()"
+      class="mt-6 rounded-xs bg-primary-gradient px-8 py-3 text-sm font-semibold text-white shadow-card transition-all duration-200 ease-in-out hover:scale-[1.02]"
+    >
+      Retry Connection
+    </button>
+  </div>
+  } @else {
+  <!-- Members state -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Project Members</h1>
+    </div>
+    <a
+      routerLink="/projects/add"
+      class="hidden lg:flex mt-auto cursor-pointer rounded-xs bg-primary-gradient px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 ease-in-out hover:scale-[1.02]"
+    >
+      <img src="assets/icons/invite.svg" alt="" class="size-5 me-1.5" />
+      Invite Members
+    </a>
+  </div>
+  <!-- Members list -->
+  <div class="mx-auto mt-8 max-w-[580px] overflow-hidden rounded-lg bg-white shadow-sm">
+    <!-- Desktop table header -->
+    <div
+      class="hidden grid-cols-[1fr_140px] border-b border-slate-100 bg-slate-50 px-8 py-5 lg:grid"
+    >
+      <span class="text-[11px] font-bold uppercase tracking-wider text-gay-medium"> Member </span>
+
+      <span class="text-[11px] font-bold uppercase tracking-wider text-gay-medium"> Role </span>
+    </div>
+
+    @for (member of members(); track member.member_id) {
+    <!-- Desktop member row -->
+    <div
+      class="hidden grid-cols-[1fr_140px] items-center border-b border-slate-100 px-8 py-5 last:border-b-0 lg:grid"
+    >
+      <div class="flex items-center gap-4">
+        <!-- Avatar -->
+        <div
+          class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-light text-sm font-bold text-primary"
+        >
+          {{ getInitials(member) }}
+        </div>
+
+        <!-- Member information -->
+        <div class="min-w-0">
+          <p class="truncate text-sm font-semibold text-slate-900">{{ member.metadata.name }}</p>
+
+          <p class="truncate text-xs text-slate-500">{{ member.email }}</p>
+        </div>
+      </div>
+
+      <!-- Role -->
+      <div>
+        <span
+          class="inline-flex rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide"
+          [class.bg-primary-container]="member.role === 'owner'"
+          [class.text-white]="member.role === 'owner'"
+          [class.bg-primary-light]="member.role !== 'owner'"
+          [class.text-gay-medium]="member.role !== 'owner'"
+        >
+          {{ member.role }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Mobile member card -->
+    <div class="mb-3 flex items-center gap-4 rounded-lg bg-white p-4 lg:hidden">
+      <!-- Avatar -->
+      <div
+        class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-light text-sm font-bold text-primary"
+      >
+        {{ getInitials(member) }}
+      </div>
+
+      <!-- Member information -->
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-sm font-semibold text-slate-900">{{ member.metadata.name }}</p>
+
+        <p class="truncate text-xs text-slate-500">{{ member.email }}</p>
+      </div>
+
+      <!-- Role -->
+      <span
+        class="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide"
+        [class.bg-primary-container]="member.role === 'owner'"
+        [class.text-white]="member.role === 'owner'"
+        [class.text-gray-dark]="member.role === 'admin'"
+        [class.bg-primary-light]="member.role !== 'owner'"
+        [class.text-gray-medium]="member.role !== 'owner' && member.role !== 'admin'"
+      >
+        {{ member.role }}
+      </span>
+    </div>
+    }
+  </div>
+
+  <!-- Mobile invite button -->
+  <button
+    type="button"
+    aria-label="Invite member"
+    class="fixed bottom-20 right-5 z-30 flex size-11 items-center justify-center rounded-lg bg-primary-gradient text-white shadow-card transition hover:scale-105 lg:hidden"
+  >
+    <img src="assets/icons/invite.svg" alt="" class="size-5" />
+  </button>
+  }
+</div>
