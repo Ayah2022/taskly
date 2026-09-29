@@ -1,7 +1,7 @@
 import { Component, inject, DestroyRef, signal, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
-import { SlicePipe } from '@angular/common';
+// import { SlicePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 interface BreadcrumbItem {
   label: string;
@@ -11,7 +11,7 @@ interface BreadcrumbItem {
 @Component({
   selector: 'app-breadcrumb',
   standalone: true,
-  imports: [RouterLink, SlicePipe],
+  imports: [RouterLink],
   templateUrl: './breadcrumb.html',
 })
 export class Breadcrumb implements OnInit {

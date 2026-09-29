@@ -25,21 +25,14 @@ export class LoginService {
   async login(data: LoginModel): Promise<LoginResult> {
     try {
       const session = await firstValueFrom(
-        this.http.post<LoginResponse>(
-          `${this.loginEndpoint}?grant_type=password`,
-          {
-            email: data.email,
-            password: data.password,
-          },
-          {
-            headers: {
-              apikey: environment.apiKey,
-              'Content-Type': 'application/json',
-            },
-          },
-        ),
+        this.http.post<LoginResponse>(`${this.loginEndpoint}?grant_type=password`, {
+          email: data.email,
+          password: data.password,
+        }),
       );
-      console.log("remember me", data ,data.rememberMe);
+
+      console.log('remember me', data, data.rememberMe);
+
       this.storageService.setSession(session, data.rememberMe);
 
       return {
@@ -55,13 +48,8 @@ export class LoginService {
 
   async logout(): Promise<LoginResult> {
     try {
-      await firstValueFrom(
-        this.http.post<void>(this.logoutEndpoint, null, {
-          headers: {
-            apikey: environment.apiKey,
-          },
-        }),
-      );
+      //null -> no request body
+      await firstValueFrom(this.http.post<void>(this.logoutEndpoint, null));
 
       return {
         ok: true,
@@ -75,7 +63,6 @@ export class LoginService {
       this.storageService.clearSession();
     }
   }
-
   private getLoginErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       if (typeof error.error?.msg === 'string') {

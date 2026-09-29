@@ -19,24 +19,13 @@ export class ProjectsService {
   private readonly endpoint = `${environment.apiUrl}/rest/v1/rpc/get_projects`;
   private readonly projectsEndpoint = `${environment.apiUrl}/rest/v1/projects`;
   async getProjects(): Promise<ProjectModel[]> {
-    return firstValueFrom(
-      this.http.post<ProjectModel[]>(
-        this.endpoint,
-        {},
-        {
-          headers: {
-            apikey: environment.apiKey,
-          },
-        },
-      ),
-    );
+    return firstValueFrom(this.http.post<ProjectModel[]>(this.endpoint, {}));
   }
 
   async createProject(payload: CreateProjectPayload): Promise<ProjectModel> {
     const projects = await firstValueFrom(
       this.http.post<ProjectModel[]>(this.projectsEndpoint, payload, {
         headers: {
-          apikey: environment.apiKey,
           Prefer: 'return=representation',
         },
       }),
@@ -52,23 +41,17 @@ export class ProjectsService {
   }
 
   getProject(projectId: string): Observable<ProjectModel> {
-    return this.http
-      .get<ProjectModel[]>(`${this.projectsEndpoint}?id=eq.${projectId}`, {
-        headers: {
-          apikey: environment.apiKey,
-        },
-      })
-      .pipe(
-        map((projects) => {
-          const project = projects[0];
+    return this.http.get<ProjectModel[]>(`${this.projectsEndpoint}?id=eq.${projectId}`).pipe(
+      map((projects) => {
+        const project = projects[0];
 
-          if (!project) {
-            throw new Error('Project not found.');
-          }
+        if (!project) {
+          throw new Error('Project not found.');
+        }
 
-          return project;
-        }),
-      );
+        return project;
+      }),
+    );
   }
 
   async updateProject(
@@ -84,7 +67,6 @@ export class ProjectsService {
         payload,
         {
           headers: {
-            apikey: environment.apiKey,
             Prefer: 'return=representation',
           },
         },

@@ -1,0 +1,161 @@
+<div class="mx-auto w-full px-6 py-8 lg:px-10">
+  <!-- Page heading -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-dark">Create New Epic</h1>
+
+    <p class="mt-2 max-w-[620px] text-sm leading-6 text-slate-500">
+      Define a major project phase or high-level milestone to group related tasks and track
+      architectural progress.
+    </p>
+  </div>
+
+  <!-- Form card -->
+  <form
+    novalidate
+    (submit)="onSubmit($event)"
+    class="w-full rounded-xl bg-white p-8 shadow-card lg:p-10"
+  >
+    <!-- TITLE -->
+    <div class="grid grid-cols-1 gap-3 lg:grid-cols-[160px_1fr] lg:gap-5">
+      <div>
+        <label for="title" class="text-xs font-bold uppercase tracking-wider text-slate-600">
+          Title
+          <span class="text-red-500">*</span>
+        </label>
+      </div>
+
+      <div>
+        <input
+          id="title"
+          type="text"
+          autocomplete="off"
+          placeholder="e.g. Structural Foundation Phase"
+          [formField]="epicForm.title"
+          class="w-full rounded-md border-0 bg-[#D8E2FA] px-4 py-3 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-[#0057B8]"
+        />
+
+        <!-- Title validation -->
+        @if ( epicForm.title().touched() && epicForm.title().invalid() ) {
+        <div class="mt-2 flex items-start gap-2 text-xs text-red-600">
+          @if ( epicForm.title().errors().some( error => error.kind === 'required' ) ) {
+          <span> TITLE IS REQUIRED </span>
+          } @if ( epicForm.title().errors().some( error => error.kind === 'minLength' ) ) {
+          <span> TITLE MUST BE AT LEAST 3 CHARACTERS </span>
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="mt-8 grid grid-cols-1 gap-3 lg:grid-cols-[160px_1fr] lg:gap-5">
+      <div>
+        <label for="description" class="text-xs font-bold uppercase tracking-wider text-slate-600">
+          Description
+
+          <span
+            class="mt-1 block text-[11px] font-normal normal-case tracking-normal text-slate-400"
+          >
+            Optional
+          </span>
+        </label>
+      </div>
+
+      <div>
+        <textarea
+          id="description"
+          rows="5"
+          placeholder="Describe the scope and objectives of this epic..."
+          [formField]="epicForm.description"
+          class="w-full resize-none rounded-md border-0 bg-[#D8E2FA] px-4 py-3 text-sm leading-6 text-slate-800 outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-[#0057B8]"
+        ></textarea>
+
+        <div class="mt-1 text-right text-xs text-slate-400">
+          {{ epicModel().description.length }} / 500 characters
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSIGNEE + DEADLINE -->
+    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+      <!-- ASSIGNEE -->
+      <div>
+        <label
+          for="assignee"
+          class="mb-3 block text-xs font-bold uppercase tracking-wider text-slate-600"
+        >
+          Assignee
+        </label>
+        <div class="relative">
+          <select
+            id="assignee"
+            [formField]="epicForm.assignee_id"
+            class="w-full appearance-none rounded-md border-0 bg-[#D8E2FA] px-4 py-3 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-[#0057B8]"
+          >
+            <option value="">Select a member...</option>
+
+            @for (member of projectMembers(); track member.member_id) {
+            <option [value]="member.user_id">{{ member.metadata.name }}</option>
+            }
+          </select>
+          <img
+            src="assets/icons/arrow-up.svg"
+            alt=""
+            class="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 rotate-180"
+          />
+        </div>
+      </div>
+
+      <!-- DEADLINE -->
+      <div>
+        <label
+          for="deadline"
+          class="mb-3 block text-xs font-bold uppercase tracking-wider text-slate-600"
+        >
+          Deadline
+        </label>
+
+        <input
+          id="deadline"
+          type="date"
+          [formField]="epicForm.deadline"
+          [min]="today"
+          class="w-full rounded-md border-0 bg-[#D8E2FA] px-4 py-3 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-[#0057B8]"
+        />
+
+        @if ( epicForm.deadline().touched() && epicForm.deadline().invalid() ) { @if (
+        epicForm.deadline().errors().some( error => error.kind === 'pastDate' ) ) {
+        <p class="mt-2 text-xs text-red-600">DEADLINE MUST BE TODAY OR A FUTURE DATE</p>
+        } }
+      </div>
+    </div>
+
+    <!-- API ERROR -->
+    @if (submitError()) {
+    <div class="mt-6 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">{{ submitError() }}</div>
+    }
+
+    <!-- DIVIDER -->
+    <div class="my-8 border-t border-slate-100"></div>
+
+    <!-- ACTIONS -->
+    <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+      <button
+        type="button"
+        (click)="cancel()"
+        [disabled]="submitting()"
+        class="rounded-md px-5 py-3 text-sm font-semibold text-slate-500 transition hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        [disabled]="submitting()"
+        class="cursor-pointer rounded-sm bg-primary-gradient px-8 py-3 text-sm font-semibold text-white shadow-md transition-all duration-200 ease-in-out hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        @if (submitting()) { Creating... } @else { Create Epic }
+      </button>
+    </div>
+  </form>
+</div>

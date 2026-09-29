@@ -14,12 +14,6 @@ export class UserService {
   private readonly endpoint = `${environment.apiUrl}/auth/v1/user`;
 
   async getCurrentUser(): Promise<UserModel> {
-    return firstValueFrom(
-      this.http.get<UserModel>(this.endpoint, {
-        headers: {
-          apikey: environment.apiKey,
-        },
-      }),
-    );
+    return firstValueFrom(this.http.get<UserModel>(this.endpoint));
   }
 }

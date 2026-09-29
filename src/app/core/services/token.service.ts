@@ -33,7 +33,6 @@ export class TokenService {
           },
           {
             headers: {
-              apikey: environment.apiKey,
               'Content-Type': 'application/json',
             },
           },

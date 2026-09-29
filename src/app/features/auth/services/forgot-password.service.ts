@@ -31,12 +31,6 @@ export class ForgotPasswordService {
       this.http.post<void>(
         `${this.recoverEndpoint}?redirect_to=${encodeURIComponent(redirectTo)}`,
         payload,
-        {
-          headers: {
-            apikey: environment.apiKey,
-            'Content-Type': 'application/json',
-          },
-        },
       ),
     );
   }
@@ -50,8 +44,6 @@ export class ForgotPasswordService {
       this.http.put<void>(this.userEndpoint, payload, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          apikey: environment.apiKey,
-          'Content-Type': 'application/json',
         },
       }),
     );

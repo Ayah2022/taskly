@@ -35,14 +35,7 @@ export class SignupService {
     }
 
     try {
-      await firstValueFrom(
-        this.http.post(this.endpoint, request, {
-          headers: {
-            apikey: environment.apiKey,
-            'Content-Type': 'application/json',
-          },
-        }),
-      );
+      await firstValueFrom(this.http.post(this.endpoint, request));
 
       return {
         ok: true,

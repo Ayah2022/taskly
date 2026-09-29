@@ -5,17 +5,18 @@
       @if (!last) {
       <a
         [routerLink]="breadcrumb.url"
-        class="label-breadcrumb transition hover:text-primary-container"
+        class="label-breadcrumb uppercase transition hover:text-primary-container"
       >
-        {{ breadcrumb.label.length > 18 ? (breadcrumb.label | slice: 0 : 18) + '...' :
-        breadcrumb.label }}
+        <!-- {{ breadcrumb.label.length > 18 ? (breadcrumb.label | slice: 0 : 18) + '...' :
+        breadcrumb.label }} -->
+        {{breadcrumb.label}}
       </a>
 
       <span class="size-2">
         <img src="assets/icons/grey-arrow-left.svg" class="size-2" alt="arrow" />
       </span>
       } @else {
-      <span class="label-breadcrumb active"> {{ breadcrumb.label }} </span>
+      <span class="label-breadcrumb uppercase active"> {{ breadcrumb.label }} </span>
       }
     </li>
     }

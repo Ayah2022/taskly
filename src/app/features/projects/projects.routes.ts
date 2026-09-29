@@ -45,6 +45,17 @@ export const PROJECTS_ROUTES: Routes = [
         data: {
           breadcrumb: 'Epics',
         },
+        children: [
+          // /projects/:projectId/epics/new
+          {
+            path: 'new',
+            loadComponent: () =>
+              import('./pages/add-epic/add-epic').then((component) => component.AddEpic),
+            data: {
+              breadcrumb: 'New Epic',
+            },
+          },
+        ],
       },
 
       // /projects/:projectId/edit
