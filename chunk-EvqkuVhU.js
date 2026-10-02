@@ -1,0 +1,1 @@
+import{En as wv,_ as Ey,i as Aa,kn as xa}from"./chunk-2Fc6edln.js";var r=class t{static ɵfac=function(e){return new(e||t)};static ɵcmp=Ey({type:t,selectors:[[`app-project-tasks`]],decls:2,vars:0,template:function(e,p){e&1&&(xa(0,`p`),wv(1,`project-tasks works!`),Aa())},encapsulation:2})};export{r as ProjectTasks};

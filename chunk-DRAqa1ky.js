@@ -1,0 +1,1 @@
+import{Mn as zd,_ as Ey}from"./chunk-2Fc6edln.js";import{o as Sr}from"./main-YX5G7SVN.js";var s=class t{static ɵfac=function(e){return new(e||t)};static ɵcmp=Ey({type:t,selectors:[[`app-project-epics`]],decls:1,vars:0,template:function(e,n){e&1&&zd(0,`router-outlet`)},dependencies:[Sr],encapsulation:2})};export{s as ProjectEpics};
