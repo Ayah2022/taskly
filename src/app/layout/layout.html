@@ -1,23 +1,28 @@
-<div class="flex min-h-screen w-screen">
+<div class="flex h-screen w-screen overflow-hidden">
   <!-- Sidebar -->
-  <aside class="shrink-0 bg-surface-low">
+  <aside class="h-screen shrink-0 bg-surface-low">
     <app-sidebar [mobileMenuOpen]="sidebarOpen()" (closeMobileMenu)="closeSidebar()" />
   </aside>
 
-  <!-- Right side wrapper -->
-  <div class="flex min-w-0 flex-1 flex-col bg-background">
+  <!-- Right side -->
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
     <!-- Header -->
     <header class="shrink-0">
       <app-header (menuToggle)="toggleSidebar()" />
     </header>
 
-    <!-- Content -->
-    <main class="min-h-0 flex-1 overflow-y-auto pb-16 lg:pb-0">
-      <div class="pt-6 pb-4 px-7 hidden lg:block">
+    <!-- Scrollable content -->
+    <main class="min-h-0 min-w-0 flex-1 overflow-y-auto pb-16 lg:pb-0">
+      <div class="hidden px-7 pt-6 pb-4 lg:block">
         <app-breadcrumb />
       </div>
+
       <router-outlet />
     </main>
+
+    <!-- Footer -->
+    <footer class="shrink-0">
+      <app-footer />
+    </footer>
   </div>
-  <app-footer />
 </div>

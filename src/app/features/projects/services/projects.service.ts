@@ -1,5 +1,5 @@
 // projects.service.ts
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom, map, Observable } from 'rxjs';
 
@@ -18,10 +18,19 @@ export class ProjectsService {
 
   private readonly endpoint = `${environment.apiUrl}/rest/v1/rpc/get_projects`;
   private readonly projectsEndpoint = `${environment.apiUrl}/rest/v1/projects`;
-  async getProjects(): Promise<ProjectModel[]> {
-    return firstValueFrom(this.http.post<ProjectModel[]>(this.endpoint, {}));
-  }
+  getProjects(limit: number, offset: number): Observable<HttpResponse<ProjectModel[]>> {
+    return this.http.get<ProjectModel[]>(`${this.endpoint}`, {
+      params: {
+        limit,
+        offset,
+      },
 
+      observe: 'response',
+      headers: {
+        Prefer: 'count=exact',
+      },
+    });
+  }
   async createProject(payload: CreateProjectPayload): Promise<ProjectModel> {
     const projects = await firstValueFrom(
       this.http.post<ProjectModel[]>(this.projectsEndpoint, payload, {
