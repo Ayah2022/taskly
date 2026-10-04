@@ -54,14 +54,17 @@ export class Breadcrumb implements OnInit {
         url += `/${routePath}`;
       }
 
-      const breadcrumb = route.snapshot.data['breadcrumb'];
-
+      const breadcrumb = route.routeConfig?.data?.['breadcrumb'];
       if (!breadcrumb) {
         continue;
       }
 
       let label = breadcrumb;
-
+      console.log({
+        routePath,
+        breadcrumb,
+        resolvedData: route.snapshot.data,
+      });
       // Dynamic project name
       if (breadcrumb === 'project') {
         const project = route.snapshot.data['project'];

@@ -36,26 +36,14 @@ export const PROJECTS_ROUTES: Routes = [
         pathMatch: 'full',
         redirectTo: 'epics',
       },
-      // /projects/:projectId/epics
-      {
-        path: 'epics',
-        loadComponent: () =>
-          import('./pages/project-epics/project-epics').then((component) => component.ProjectEpics),
 
-        data: {
-          breadcrumb: 'Epics',
-        },
-        children: [
-          // /projects/:projectId/epics/new
-          {
-            path: 'new',
-            loadComponent: () =>
-              import('./pages/add-epic/add-epic').then((component) => component.AddEpic),
-            data: {
-              breadcrumb: 'New Epic',
-            },
-          },
-        ],
+      {
+        // /projects/:projectId/epics
+        path: 'epics',
+        loadChildren: () =>
+          import('./pages/project-epics/project-epics.routes').then(
+            (routes) => routes.EPICS_ROUTES,
+          ),
       },
 
       // /projects/:projectId/edit

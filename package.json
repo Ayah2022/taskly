@@ -6,6 +6,7 @@
     "dev": "ng serve",
     "start": "ng serve",
     "build": "ng build",
+    "deploy": "ng deploy --base-href=/taskly/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "eslint .",
