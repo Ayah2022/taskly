@@ -81,7 +81,9 @@
   <!-- Epics-details modal-->
 @if (selectedEpicId(); as id) {
 @if (projectId(); as pid) {
-<app-epic-details-modal [projectId]="pid" [epicId]="id" (closed)="selectedEpicId.set(null)" />
+<app-epic-details-modal [projectId]="pid" [epicId]="id" 
+                      (closed)="selectedEpicId.set(null)"
+                      (updated)="onEpicUpdated($event)" />
 }
 }
   <!-- Mobile loading indicator -->

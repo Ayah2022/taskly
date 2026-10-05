@@ -3,7 +3,7 @@
     (click)="closed.emit()">
     <div #dialog tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="epic-modal-title"
         (keydown)="onKeydown($event)" (click)="$event.stopPropagation()"
-        class="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl sm:max-w-2xl sm:rounded-xl">
+        class="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl focus:outline-none sm:max-w-2xl sm:rounded-xl">
         <!-- Drag handle (mobile only) -->
         <div class="mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-200 sm:hidden"></div>
 
@@ -12,19 +12,21 @@
             <div class="flex flex-start gap-2 items-center">
                 <img src="assets/icons/epic-detail.svg" alt="epic-detail">
                 <span class="text-xs font-semibold tracking-wide text-slate-500">
-                    {{ epic.value()?.epic_id ?? 'EPIC' }}
+                    {{ current()?.epic_id ?? 'EPIC' }}
                 </span>
             </div>
             <div class="flex items-center gap-4">
-                <button type="button" class="text-sm flex items-center gap-2 font-semibold text-slate-600 hover:text-slate-900" (click)="copyLink()">
+                <button type="button"
+                    class="text-sm flex items-center gap-2 font-semibold text-slate-600 hover:text-slate-900"
+                    (click)="copyLink()">
                     <span>
-                            <img class="size-4" src="assets/icons/attachment.svg" alt="attachment">
+                        <img class="size-4" src="assets/icons/attachment.svg" alt="attachment">
                     </span>
                     {{ linkCopied() ? 'Copied!' : 'Copy link' }}
                 </button>
                 <button type="button" aria-label="Close" class="text-slate-500 hover:text-slate-900"
                     (click)="closed.emit()">
-                        <img class="size-4" src="assets/icons/close.svg" alt="close-icon">
+                    <img class="size-4" src="assets/icons/close.svg" alt="close-icon">
                 </button>
             </div>
         </div>
@@ -52,55 +54,127 @@
                 Retry
             </button>
         </div>
-        } @else if (epic.value(); as e) {
-        <!-- Content -->
-        <h2 id="epic-modal-title"
-            class="rounded-lg border border-slate-200 px-3 py-3 text-lg font-semibold text-slate-900">
-            {{ e.title }}
-        </h2>
+        } @else if (current(); as e) {
+        <!-- Title (editable, saves on blur) -->
+        <div>
+            <label for="epic-title" class="sr-only">Epic title</label>
+            <input #titleInput id="epic-title" type="text" required maxlength="200" [value]="e.title"
+                [attr.aria-invalid]="titleError()"
+                class="w-full rounded-lg border bg-white px-3 py-3 text-lg font-semibold text-slate-900 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+                [class]="titleError() ? 'border-red-400' : 'border-slate-200'" (input)="titleError.set(false)"
+                (keydown.enter)="titleInput.blur()" (blur)="saveTitle(titleInput, e)" />
+            @if (titleError()) {
+            <p role="alert" class="mt-1 text-xs text-red-600">Title is required.</p>
+            }
+        </div>
 
-        <p class="mt-4 min-h-32 whitespace-pre-line rounded-lg border border-slate-200 px-3 py-3 text-sm"
-            [class.text-slate-500]="!e.description">
-            {{ e.description || 'No description provided' }}
-        </p>
+        <!-- Description (editable, saves on blur) -->
+        <label for="epic-description" class="sr-only">Epic description</label>
+        <textarea #descInput id="epic-description" rows="5" placeholder="No description provided"
+            [value]="e.description ?? ''"
+            class="mt-4 min-h-32 w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 placeholder:text-slate-500 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+            (blur)="saveDescription(descInput, e)"></textarea>
 
         <div class="mt-6 grid grid-cols-1 gap-x-3 gap-y-4 sm:grid-cols-2">
+            <!-- Assignee (click to edit, saves on selection) -->
             <div>
                 <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Assignee</span>
-                <div class="mt-1 flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
-                    @if (e.assignee) {
-                    <span
-                        class="grid size-6 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800">
-                        {{ initials(e.assignee) }}
-                    </span>
-                    {{ e.assignee?.name}}
-                    } @else {
-                    <span class="text-slate-500">Unassigned</span>
+
+                <div #assigneeBox class="relative mt-1" (focusout)="onAssigneeFocusOut($event, assigneeBox)"
+                    (keydown.escape)="$event.stopPropagation(); assigneeOpen.set(false)">
+                    <button type="button" aria-haspopup="true" [attr.aria-expanded]="assigneeOpen()"
+                        class="flex w-full items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-sm hover:border-slate-300 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+                        (click)="toggleAssignee()">
+                        @if (e.assignee; as assignee) {
+                        <span class="flex min-w-0 items-center gap-2" [attr.title]="userTooltip(assignee)">
+                            <span aria-hidden="true"
+                                class="grid size-6 shrink-0 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800">
+                                {{ initials(assignee) }}
+                            </span>
+                            <span class="truncate">{{ assignee.name }}</span>
+                        </span>
+                        } @else {
+                        <span class="text-slate-500">Unassigned</span>
+                        }
+                        <span aria-hidden="true" class="text-slate-400">▾</span>
+                    </button>
+
+                    @if (assigneeOpen()) {
+                    <ul
+                        class="absolute left-0 right-0 z-10 mt-1 max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                        <li>
+                            <button type="button"
+                                class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
+                                [class.bg-blue-50]="!e.assignee" [attr.aria-current]="!e.assignee"
+                                (click)="selectAssignee(null)">
+                                Unassigned
+                            </button>
+                        </li>
+
+                        @if (members.isLoading()) {
+                        <li class="px-3 py-2 text-sm text-slate-500" aria-live="polite">Loading members…</li>
+                        } @else if (members.error()) {
+                        <li class="flex items-center justify-between px-3 py-2 text-sm text-red-600">
+                            Couldn't load members
+                            <button type="button" class="font-medium underline" (click)="members.reload()">
+                                Retry
+                            </button>
+                        </li>
+                        } @else {
+                        @for (member of members.value(); track member.sub) {
+                        <li>
+                            <button type="button"
+                                class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
+                                [class.bg-blue-50]="member.sub === e.assignee?.sub"
+                                [attr.aria-current]="member.sub === e.assignee?.sub" [attr.title]="userTooltip(member)"
+                                (click)="selectAssignee(member)">
+                                <span aria-hidden="true"
+                                    class="grid size-6 shrink-0 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800">
+                                    {{ initials(member) }}
+                                </span>
+                                <span class="truncate">{{ member.name }}</span>
+                            </button>
+                        </li>
+                        } @empty {
+                        <li class="px-3 py-2 text-sm text-slate-500">No project members found</li>
+                        }
+                        }
+                    </ul>
                     }
                 </div>
             </div>
 
+            <!-- Deadline (editable, saves on change) -->
             <div>
-                <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Deadline</span>
-                <div class="mt-1 rounded-lg border border-slate-200 px-3 py-2 text-sm">
-                    {{ e.deadline ? (e.deadline | date: 'MMM d, y') : 'No deadline' }}
-                </div>
+                <label for="epic-deadline"
+                    class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Deadline</label>
+                <input #deadlineInput id="epic-deadline" type="date" [value]="e.deadline?.slice(0, 10) ?? ''"
+                    class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+                    (change)="saveDeadline(deadlineInput, e)" />
             </div>
 
+            <!-- Created by (read-only) -->
             <div>
                 <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Created by</span>
-                <div class="mt-1 flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
-                    <span
-                        class="grid size-6 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800">
-                        {{ initials(e.created_by) }}
+                <div class="mt-1 flex items-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                    @if (e.created_by; as creator) {
+                    <span class="flex min-w-0 items-center gap-2" [attr.title]="userTooltip(creator)">
+                        <span aria-hidden="true"
+                            class="grid size-6 shrink-0 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800">
+                            {{ initials(creator) }}
+                        </span>
+                        <span class="truncate">{{ creator.name }}</span>
                     </span>
-                    {{ e.created_by?.name }}
+                    } @else {
+                    <span class="text-slate-500">Unknown user</span>
+                    }
                 </div>
             </div>
 
+            <!-- Created at (read-only) -->
             <div>
                 <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Created at</span>
-                <div class="mt-1 rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                <div class="mt-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
                     {{ e.created_at | date: 'MMM d, y' }}
                 </div>
             </div>

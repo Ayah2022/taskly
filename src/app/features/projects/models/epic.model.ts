@@ -15,3 +15,10 @@ export interface EpicModel {
   created_by: EpicUser | null;
   assignee: EpicUser | null;
 }
+
+export interface EpicPatch {
+  title?: string;
+  description?: string | null;
+  assignee_id?: string | null;
+  deadline?: string | null;
+}

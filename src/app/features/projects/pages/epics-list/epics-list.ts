@@ -50,7 +50,7 @@ export class EpicsList implements OnInit, OnDestroy {
   private observer?: IntersectionObserver;
 
   private readonly mobileQuery = '(max-width: 767px)';
-
+  private readonly dirty = signal(false);
   protected readonly selectedEpicId = signal<string | null>(null);
 
   @ViewChild('loadMoreSentinel')
@@ -162,6 +162,22 @@ export class EpicsList implements OnInit, OnDestroy {
 
     return this.epics().filter((epic) => epic.title.toLowerCase().includes(term));
   });
+
+
+
+  protected onEpicUpdated(updated: EpicModel): void {
+    this.epics.update((list) => list.map((e) => (e.id === updated.id ? { ...e, ...updated } : e)));
+    this.dirty.set(true);
+  }
+
+  protected closeModal(): void {
+    this.selectedEpicId.set(null);
+    if (this.dirty()) {
+      this.dirty.set(false);
+      this.loadEpics(); // your existing list-loading method, ideally without a full-grid spinner
+    }
+  }
+
   private updatePaginationMetadata(contentRange: string | null): void {
     const match = contentRange?.match(/\/(\d+|\*)$/);
 

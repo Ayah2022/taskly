@@ -4,7 +4,8 @@ import { firstValueFrom, map, Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import type { CreateEpicModel } from '../models/createEpic.model';
-import { EpicModel } from '../models/epic.model';
+import { EpicModel, EpicPatch } from '../models/epic.model';
+
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +46,20 @@ export class EpicsService {
     });
   }
 
-  // epics.service.ts
+  updateEpic(id: string, patch: EpicPatch): Observable<void> {
+    return this.http
+      .patch<unknown[]>(`${this.baseUrl}/rest/v1/epics`, patch, {
+        params: new HttpParams().set('id', `eq.${id}`),
+        headers: { Prefer: 'return=representation' },
+      })
+      .pipe(
+        map((rows) => {
+          // PostgREST returns 200 with [] when no row matched (e.g. blocked by RLS)
+          if (!rows.length) throw new Error('No epic was updated');
+        }),
+      );
+  }
+  
   getEpicById(projectId: string, epicId: string): Observable<EpicModel | null> {
     const params = new HttpParams()
       .set('project_id', `eq.${projectId}`)
