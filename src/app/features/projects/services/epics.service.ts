@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom, map, Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import type { CreateEpicModel } from '../models/createEpic.model';
@@ -43,5 +43,18 @@ export class EpicsService {
         Prefer: 'count=exact',
       },
     });
+  }
+
+  // epics.service.ts
+  getEpicById(projectId: string, epicId: string): Observable<EpicModel | null> {
+    const params = new HttpParams()
+      .set('project_id', `eq.${projectId}`)
+      .set('id', `eq.${epicId}`)
+      .set('limit', 1);
+
+    // PostgREST returns an array; empty array => not found
+    return this.http
+      .get<EpicModel[]>(this.endpoint, { params })
+      .pipe(map((rows) => rows[0] ?? null));
   }
 }

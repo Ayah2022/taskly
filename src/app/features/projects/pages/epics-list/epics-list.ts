@@ -18,9 +18,10 @@ import { EpicsService } from '../../services/epics.service';
 import { EpicCard } from '../../../../shared/components/epic-card/epic-card';
 import { EpicCardSkeleton } from '../../../../shared/components/epic-card-skeleton/epic-card-skeleton';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { EpicDetailsModal } from '../../../../shared/components/epic-details-modal/epic-details-modal';
 
 @Component({
-  imports: [EpicCard, EpicCardSkeleton, RouterLink],
+  imports: [EpicCard, EpicCardSkeleton, RouterLink,EpicDetailsModal],
   selector: 'app-epics-list',
   styleUrl: './epics-list.css',
   templateUrl: './epics-list.html',
@@ -49,6 +50,8 @@ export class EpicsList implements OnInit, OnDestroy {
   private observer?: IntersectionObserver;
 
   private readonly mobileQuery = '(max-width: 767px)';
+
+  protected readonly selectedEpicId = signal<string | null>(null);
 
   @ViewChild('loadMoreSentinel')
   set loadMoreSentinel(element: ElementRef<HTMLElement> | undefined) {

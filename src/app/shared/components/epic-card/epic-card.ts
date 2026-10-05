@@ -1,9 +1,16 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { EpicUser } from '../../../features/projects/models/epic.model';
 
 @Component({
   selector: 'app-epic-card',
   templateUrl: './epic-card.html',
+  host: {
+    role: 'button',
+    tabindex: '0',
+    class: 'cursor-pointer',
+    '(click)': 'selected.emit()',
+    '(keydown.enter)': 'selected.emit()',
+  }
 })
 export class EpicCard {
   readonly epicId = input.required<string>();
@@ -13,6 +20,7 @@ export class EpicCard {
   readonly createdAt = input<string | null>(null);
   readonly deadline = input<string | null>(null);
 
+  readonly selected = output<void>();
   get assigneeInitials(): string {
     const name = this.assignee()?.name?.trim();
 
