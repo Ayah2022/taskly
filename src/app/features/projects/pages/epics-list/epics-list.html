@@ -1,5 +1,5 @@
 <div class="p-6">
-  @if (isLoading()) {
+  @if (isLoading() && !projectHasEpics()) {
   <div class="flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-slate-dark">Project Epics</h1>
@@ -14,18 +14,18 @@
     <app-epic-card-skeleton />
     }
   </div>
-  } @else if (hasError()) {
+  } @else if (hasError() && !projectHasEpics()) {
   <div class="flex flex-col items-center justify-center px-4 py-12 text-center">
     <h2 class="text-base font-semibold text-slate-900">Something went wrong</h2>
 
     <p class="mt-2 text-sm text-slate-500">Failed to load epics</p>
 
-    <button type="button" (click)="loadEpics(1)"
-      class="mt-5 rounded-xs bg-primary-gradient px-8 py-3 text-xs font-semibold text-white">
+    <button type="button" (click)="loadEpics(currentPage())"
+      class="mt-4 rounded-xs bg-primary-gradient px-6 py-2.5 text-xs font-semibold text-white">
       Retry Connection
     </button>
   </div>
-  } @else if (epics().length === 0) {
+  } @else if (!projectHasEpics()) {
   <!-- Empty state -->
   <div class="flex flex-1 flex-col items-center justify-center px-4 text-center">
     <div class="flex size-52 items-center justify-center">
@@ -58,9 +58,15 @@
         class="flex min-w-0 flex-1 items-center gap-2 rounded-sm bg-[#D9E3FC] px-3 h-10 sm:w-52 sm:flex-none lg:w-52">
         <img src="assets/icons/search.svg" alt="search icon" />
 
-        <input type="search" aria-label="Search epics by name" placeholder="Search epics..." [value]="searchTerm()"
-          (input)="searchTerm.set($any($event.target).value)"
-          class="min-w-0 w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400" />
+      <input #searchBox type="search" autocomplete="off" aria-label="Search epics by name" placeholder="Search epics..."
+        [value]="searchInput()" (input)="onSearchInput(searchBox.value)"
+        class="min-w-0 w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 [&::-webkit-search-cancel-button]:hidden" />
+      
+      @if (searchInput()) {
+      <button type="button" aria-label="Clear search" (click)="clearSearch()" class="shrink-0">
+        <img class="size-3" src="assets/icons/close.svg" alt="" />
+      </button>
+      }
       </div>
 
       <!-- New Epic -->
@@ -72,12 +78,33 @@
   </div>
 
   <!-- Epic cards -->
-  <div class="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
-    @for (epic of filteredEpics(); track epic.id) {
-    <app-epic-card [epicId]="epic.epic_id" [title]="epic.title" [assignee]="epic.assignee" [creator]="epic.created_by"
-      [createdAt]="epic.created_at" [deadline]="epic.deadline" (selected)="selectedEpicId.set(epic.id)" />
-    }
+<!-- Epic cards -->
+<div class="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
+  @if (isLoading()) {
+  @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+  <app-epic-card-skeleton />
+  }
+  } @else if (hasError()) {
+  <div role="alert" class="col-span-full flex flex-col items-center px-4 py-12 text-center">
+    <p class="text-sm font-semibold text-slate-900">
+      {{ searchTerm() ? 'Failed to search epics' : 'Failed to load epics' }}
+    </p>
+    <button type="button" (click)="loadEpics(currentPage())"
+      class="mt-4 rounded-xs bg-primary-gradient px-6 py-2.5 text-xs font-semibold text-white">
+      Retry
+    </button>
   </div>
+  } @else if (epics().length === 0) {
+  <p class="col-span-full px-4 py-12 text-center text-sm text-slate-500">
+    No epics found matching your search
+  </p>
+  } @else {
+  @for (epic of epics(); track epic.id) {
+  <app-epic-card [epicId]="epic.epic_id" [title]="epic.title" [assignee]="epic.assignee" [creator]="epic.created_by"
+    [createdAt]="epic.created_at" [deadline]="epic.deadline" (selected)="selectedEpicId.set(epic.id)" />
+  }
+  }
+</div>
   <!-- Epics-details modal-->
 @if (selectedEpicId(); as id) {
 @if (projectId(); as pid) {

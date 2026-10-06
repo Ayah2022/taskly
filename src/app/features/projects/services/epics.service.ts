@@ -30,17 +30,25 @@ export class EpicsService {
     projectId: string,
     limit: number,
     offset: number,
+    searchTerm = '',
   ): Observable<HttpResponse<EpicModel[]>> {
-    const params = new HttpParams()
+    let params = new HttpParams()
       .set('project_id', `eq.${projectId}`)
       .set('limit', limit)
       .set('offset', offset)
       .set('order', 'created_at.desc');
 
+    const term = searchTerm.trim();
+    if (term) {
+      // title param: it is only added when the trimmed term is non - empty
+      params = params.set('title', `ilike.%${escapeLike(term)}%`);
+    }
+
     return this.http.get<EpicModel[]>(this.endpoint, {
       params,
       observe: 'response',
       headers: {
+        'Content-Type': 'application/json',
         Prefer: 'count=exact',
       },
     });
@@ -71,4 +79,8 @@ export class EpicsService {
       .get<EpicModel[]>(this.endpoint, { params })
       .pipe(map((rows) => rows[0] ?? null));
   }
+  
+}
+function escapeLike(term: string): string {
+  return term.replace(/[\\%_]/g, '\\$&');
 }

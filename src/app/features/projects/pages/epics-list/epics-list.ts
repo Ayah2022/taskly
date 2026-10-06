@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { distinctUntilChanged, filter, finalize, map } from 'rxjs';
+import { distinctUntilChanged, filter, finalize, map, Subject, Subscription, debounceTime } from 'rxjs';
 
 import { EpicModel } from '../../models/epic.model';
 import { EpicsService } from '../../services/epics.service';
@@ -30,7 +30,12 @@ export class EpicsList implements OnInit, OnDestroy {
   private readonly epicsService = inject(EpicsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
-  readonly searchTerm = signal('');
+  readonly searchTerm = signal('');            // applied (debounced) term
+  protected readonly searchInput = signal(''); // raw text in the input
+  readonly offset = computed(() => (this.currentPage() - 1) * this.limit);
+  protected readonly projectHasEpics = signal(false);
+  private readonly search$ = new Subject<string>();
+  private requestSub?: Subscription;
   readonly projectId = signal<string | null>(null);
 
   readonly epics = signal<EpicModel[]>([]);
@@ -63,6 +68,10 @@ export class EpicsList implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.search$
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => this.applySearch(value.trim()));
+
     this.route.paramMap
       .pipe(
         map((params) => params.get('projectId')),
@@ -74,6 +83,8 @@ export class EpicsList implements OnInit, OnDestroy {
         this.projectId.set(projectId);
 
         // Reset state when navigating to another project.
+        this.searchTerm.set('');
+        this.searchInput.set('');
         this.epics.set([]);
         this.currentPage.set(1);
         this.totalCount.set(0);
@@ -81,21 +92,20 @@ export class EpicsList implements OnInit, OnDestroy {
         this.hasMoreEpics.set(true);
         this.loadMoreError.set(false);
         this.hasError.set(false);
+        this.projectHasEpics.set(false);
 
         this.loadEpics(1);
       });
   }
 
   loadEpics(page = 1, append = false): void {
-    if (this.activeRequest) {
-      return;
-    }
-
     const projectId = this.projectId();
+    if (!projectId) return;
 
-    // Guard against a missing route parameter.
-    if (!projectId) {
-      return;
+    if (append) {
+      if (this.activeRequest) return;   // don't stack "load more" requests
+    } else {
+      this.requestSub?.unsubscribe();   // cancel the stale in-flight request (e.g. the previous search)
     }
 
     const offset = (page - 1) * this.limit;
@@ -110,18 +120,14 @@ export class EpicsList implements OnInit, OnDestroy {
       this.hasError.set(false);
     }
 
-    this.epicsService
-      .getProjectEpics(projectId, this.limit, offset)
+    this.requestSub = this.epicsService
+      .getProjectEpics(projectId, this.limit, offset, this.searchTerm())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.activeRequest = false;
-
-          if (append) {
-            this.isLoadingMore.set(false);
-          } else {
-            this.isLoading.set(false);
-          }
+          if (append) this.isLoadingMore.set(false);
+          else this.isLoading.set(false);
         }),
       )
       .subscribe({
@@ -129,9 +135,11 @@ export class EpicsList implements OnInit, OnDestroy {
           const newEpics = response.body ?? [];
 
           this.updatePaginationMetadata(response.headers.get('Content-Range'));
-
           this.hasMoreEpics.set(newEpics.length === this.limit);
-
+          // Only an unfiltered, non-append response can say whether the project has epics at all.
+          if (!append && !this.searchTerm()) {
+            this.projectHasEpics.set(newEpics.length > 0 || this.totalCount() > 0);
+          }
           if (append) {
             this.epics.update((existing) => [...existing, ...newEpics]);
           } else {
@@ -140,29 +148,31 @@ export class EpicsList implements OnInit, OnDestroy {
 
           this.currentPage.set(page);
         },
-
         error: (error: HttpErrorResponse) => {
           console.error('Failed to load epics:', error);
-
-          if (append) {
-            this.loadMoreError.set(true);
-          } else {
-            this.hasError.set(true);
-          }
+          if (append) this.loadMoreError.set(true);
+          else this.hasError.set(true);
         },
       });
   }
 
-  readonly filteredEpics = computed(() => {
-    const term = this.searchTerm().trim().toLowerCase();
+  protected onSearchInput(value: string): void {
+    this.searchInput.set(value);
+    this.search$.next(value);
+  }
 
-    if (!term) {
-      return this.epics();
-    }
+  protected clearSearch(): void {
+    this.searchInput.set('');
+    this.search$.next(''); // goes through the same debounce, so the latest value always wins
+  }
 
-    return this.epics().filter((epic) => epic.title.toLowerCase().includes(term));
-  });
+  private applySearch(term: string): void {
+    if (term === this.searchTerm()) return;
 
+    this.searchTerm.set(term);
+    this.currentPage.set(1); // offset becomes 0
+    this.loadEpics(1);
+  }
 
 
   protected onEpicUpdated(updated: EpicModel): void {
@@ -172,10 +182,10 @@ export class EpicsList implements OnInit, OnDestroy {
 
   protected closeModal(): void {
     this.selectedEpicId.set(null);
-    if (this.dirty()) {
-      this.dirty.set(false);
-      this.loadEpics(); // your existing list-loading method, ideally without a full-grid spinner
-    }
+    if (!this.dirty()) return;
+
+    this.dirty.set(false);
+    if (!this.isMobile()) this.loadEpics(this.currentPage()); // keeps search + page
   }
 
   private updatePaginationMetadata(contentRange: string | null): void {
