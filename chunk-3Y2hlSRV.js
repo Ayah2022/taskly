@@ -1,0 +1,1 @@
+import{Et as Xa,T as Ja,yn as mI,zn as uv}from"./chunk-DLZmcSwC.js";var r=class t{static ɵfac=function(e){return new(e||t)};static ɵcmp=uv({type:t,selectors:[[`app-project-tasks`]],decls:2,vars:0,template:function(e,p){e&1&&(Ja(0,`p`),mI(1,`project-tasks works!`),Xa())},encapsulation:2})};export{r as ProjectTasks};

@@ -1,1 +1,0 @@
-import{Et as b,k as Jf,p as D,xn as ue}from"./chunk-2Fc6edln.js";function w(t){t||(t=D(ue));let i=new b(e=>{if(t.destroyed){e.next();return}return t.onDestroy(e.next.bind(e))});return e=>e.pipe(Jf(i))}export{w as t};
