@@ -1,207 +1,382 @@
-<!-- epic-details-modal.html -->
-<div class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/20 backdrop-blur-sm sm:items-center sm:p-6"
-    (click)="closed.emit()">
-    <div #dialog tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="epic-modal-title"
-        (keydown)="onKeydown($event)" (click)="$event.stopPropagation()"
-        class="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl focus:outline-none sm:max-w-2xl sm:rounded-xl">
-        <!-- Drag handle (mobile only) -->
-        <div class="mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-200 sm:hidden"></div>
+<!-- Modal backdrop + container -->
+<div class="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6">
+  <!-- Backdrop -->
+  <button
+    type="button"
+    aria-label="Close epic details"
+    class="absolute inset-0 cursor-default bg-slate-900/20 backdrop-blur-sm"
+    (click)="closed.emit()"
+  ></button>
 
-        <!-- Header -->
-        <div class="mb-4 flex items-center justify-between">
-            <div class="flex flex-start gap-2 items-center">
-                <img src="assets/icons/epic-detail.svg" alt="epic-detail">
-                <span class="text-xs font-semibold tracking-wide text-slate-500">
-                    {{ current()?.epic_id ?? 'EPIC' }}
-                </span>
-            </div>
-            <div class="flex items-center gap-4">
-                <button type="button"
-                    class="text-sm flex items-center gap-2 font-semibold text-slate-600 hover:text-slate-900"
-                    (click)="copyLink()">
-                    <span>
-                        <img class="size-4" src="assets/icons/attachment.svg" alt="attachment">
-                    </span>
-                    {{ linkCopied() ? 'Copied!' : 'Copy link' }}
-                </button>
-                <button type="button" aria-label="Close" class="text-slate-500 hover:text-slate-900"
-                    (click)="closed.emit()">
-                    <img class="size-4" src="assets/icons/close.svg" alt="close-icon">
-                </button>
-            </div>
+  <!-- Dialog -->
+  <div
+    #dialog
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="epic-modal-title"
+    aria-describedby="epic-modal-description"
+    class="relative z-10 flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl focus:outline-none sm:max-w-2xl sm:rounded-xl"
+    (keydown)="onKeydown($event)"
+  >
+    <!-- Mobile drag handle -->
+    <div
+      class="mx-auto mt-4 h-1.5 w-10 shrink-0 rounded-full bg-slate-200 sm:hidden"
+      aria-hidden="true"
+    ></div>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="shrink-0 border-b border-slate-100 px-6 py-4">
+      <div class="flex items-center justify-between gap-4">
+        <!-- Epic identifier -->
+        <div class="flex min-w-0 items-center gap-2">
+          <img
+            src="assets/icons/epic-detail.svg"
+            alt=""
+            aria-hidden="true"
+            class="size-5 shrink-0"
+          />
+
+          <span class="truncate text-xs font-semibold tracking-wide text-slate-500">
+            {{ current()?.epic_id ?? 'EPIC' }}
+          </span>
         </div>
 
-        @if (epic.isLoading()) {
-        <!-- Loading skeleton -->
-        <div class="animate-pulse space-y-4" aria-busy="true" aria-live="polite">
-            <div class="h-12 rounded-lg bg-slate-100"></div>
-            <div class="h-32 rounded-lg bg-slate-100"></div>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div class="h-10 rounded-lg bg-slate-100"></div>
-                <div class="h-10 rounded-lg bg-slate-100"></div>
-                <div class="h-10 rounded-lg bg-slate-100"></div>
-                <div class="h-10 rounded-lg bg-slate-100"></div>
-            </div>
+        <!-- Header actions -->
+        <div class="flex shrink-0 items-center gap-4">
+          <!-- Copy link -->
+          <button
+            type="button"
+            class="flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+            (click)="copyLink()"
+          >
+            <img class="size-4" src="assets/icons/attachment.svg" alt="" aria-hidden="true" />
+
+            <span> {{ linkCopied() ? 'Copied!' : 'Copy link' }} </span>
+          </button>
+
+          <!-- Close -->
+          <button
+            type="button"
+            aria-label="Close epic details"
+            class="flex size-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+            (click)="closed.emit()"
+          >
+            <img class="size-4" src="assets/icons/close.svg" alt="" aria-hidden="true" />
+          </button>
         </div>
-        } @else if (epic.error()) {
-        <!-- Error -->
-        <div role="alert" class="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-            <p class="font-medium text-red-800">We couldn't load this epic.</p>
-            <p class="mt-1 text-sm text-red-600">Check your connection and try again.</p>
-            <button type="button"
-                class="mt-4 rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900"
-                (click)="epic.reload()">
-                Retry
-            </button>
+      </div>
+
+      <!-- Accessible modal title -->
+      <h2 id="epic-modal-title" class="sr-only">Epic details</h2>
+
+      <p id="epic-modal-description" class="sr-only">View and edit the details of this epic.</p>
+    </header>
+
+    <!-- ==================== CONTENT ==================== -->
+    <main class="min-h-0 flex-1 overflow-y-auto px-6 py-6">
+      <!-- ==================== LOADING ==================== -->
+      @if (epic.isLoading()) {
+
+      <div
+        class="animate-pulse space-y-4"
+        aria-busy="true"
+        aria-live="polite"
+        aria-label="Loading epic details"
+      >
+        <!-- Title -->
+        <div class="h-12 rounded-lg bg-slate-100"></div>
+
+        <!-- Description -->
+        <div class="h-32 rounded-lg bg-slate-100"></div>
+
+        <!-- Metadata -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="h-10 rounded-lg bg-slate-100"></div>
+          <div class="h-10 rounded-lg bg-slate-100"></div>
+          <div class="h-10 rounded-lg bg-slate-100"></div>
+          <div class="h-10 rounded-lg bg-slate-100"></div>
         </div>
-        } @else if (current(); as e) {
-        <!-- Title (editable, saves on blur) -->
-        <div>
-            <label for="epic-title" class="sr-only">Epic title</label>
-            <input #titleInput id="epic-title" type="text" required maxlength="200" [value]="e.title"
-                [attr.aria-invalid]="titleError()"
-                class="w-full rounded-lg border bg-white px-3 py-3 text-lg font-semibold text-slate-900 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
-                [class]="titleError() ? 'border-red-400' : 'border-slate-200'" (input)="titleError.set(false)"
-                (keydown.enter)="titleInput.blur()" (blur)="saveTitle(titleInput, e)" />
-            @if (titleError()) {
-            <p role="alert" class="mt-1 text-xs text-red-600">Title is required.</p>
-            }
-        </div>
+      </div>
 
-        <!-- Description (editable, saves on blur) -->
-        <label for="epic-description" class="sr-only">Epic description</label>
-        <textarea #descInput id="epic-description" rows="5" placeholder="No description provided"
-            [value]="e.description ?? ''"
-            class="mt-4 min-h-32 w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 placeholder:text-slate-500 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
-            (blur)="saveDescription(descInput, e)"></textarea>
+      }
 
-        <div class="mt-6 grid grid-cols-1 gap-x-3 gap-y-4 sm:grid-cols-2">
-            <!-- Assignee (click to edit, saves on selection) -->
-            <div>
-                <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Assignee</span>
+      <!-- ==================== ERROR ==================== -->
+      @else if (epic.error()) {
 
-                <div #assigneeBox class="relative mt-1" (focusout)="onAssigneeFocusOut($event, assigneeBox)"
-                    (keydown.escape)="$event.stopPropagation(); assigneeOpen.set(false)">
-                    <button type="button" aria-haspopup="true" [attr.aria-expanded]="assigneeOpen()"
-                        class="flex w-full items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-sm hover:border-slate-300 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
-                        (click)="toggleAssignee()">
-                        @if (e.assignee; as assignee) {
-                        <span class="flex min-w-0 items-center gap-2" [attr.title]="userTooltip(assignee)">
-                            <span aria-hidden="true"
-                                class="grid size-6 shrink-0 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800">
-                                {{ initials(assignee) }}
-                            </span>
-                            <span class="truncate">{{ assignee.name }}</span>
-                        </span>
-                        } @else {
-                        <span class="text-slate-500">Unassigned</span>
-                        }
-                        <span aria-hidden="true" class="text-slate-400">▾</span>
-                    </button>
+      <div role="alert" class="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+        <p class="font-medium text-red-800">We couldn't load this epic.</p>
 
-                    @if (assigneeOpen()) {
-                    <ul
-                        class="absolute left-0 right-0 z-10 mt-1 max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
-                        <li>
-                            <button type="button"
-                                class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
-                                [class.bg-blue-50]="!e.assignee" [attr.aria-current]="!e.assignee"
-                                (click)="selectAssignee(null)">
-                                Unassigned
-                            </button>
-                        </li>
+        <p class="mt-1 text-sm text-red-600">Check your connection and try again.</p>
 
-                        @if (members.isLoading()) {
-                        <li class="px-3 py-2 text-sm text-slate-500" aria-live="polite">Loading members…</li>
-                        } @else if (members.error()) {
-                        <li class="flex items-center justify-between px-3 py-2 text-sm text-red-600">
-                            Couldn't load members
-                            <button type="button" class="font-medium underline" (click)="members.reload()">
-                                Retry
-                            </button>
-                        </li>
-                        } @else {
-                        @for (member of members.value(); track member.sub) {
-                        <li>
-                            <button type="button"
-                                class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
-                                [class.bg-blue-50]="member.sub === e.assignee?.sub"
-                                [attr.aria-current]="member.sub === e.assignee?.sub" [attr.title]="userTooltip(member)"
-                                (click)="selectAssignee(member)">
-                                <span aria-hidden="true"
-                                    class="grid size-6 shrink-0 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800">
-                                    {{ initials(member) }}
-                                </span>
-                                <span class="truncate">{{ member.name }}</span>
-                            </button>
-                        </li>
-                        } @empty {
-                        <li class="px-3 py-2 text-sm text-slate-500">No project members found</li>
-                        }
-                        }
-                    </ul>
-                    }
-                </div>
-            </div>
+        <button
+          type="button"
+          class="mt-4 rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
+          (click)="epic.reload()"
+        >
+          Retry
+        </button>
+      </div>
 
-            <!-- Deadline (editable, saves on change) -->
-            <div>
-                <label for="epic-deadline"
-                    class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Deadline</label>
-                <input #deadlineInput id="epic-deadline" type="date" [value]="e.deadline?.slice(0, 10) ?? ''"
-                    class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
-                    (change)="saveDeadline(deadlineInput, e)" />
-            </div>
+      }
 
-            <!-- Created by (read-only) -->
-            <div>
-                <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Created by</span>
-                <div class="mt-1 flex items-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
-                    @if (e.created_by; as creator) {
-                    <span class="flex min-w-0 items-center gap-2" [attr.title]="userTooltip(creator)">
-                        <span aria-hidden="true"
-                            class="grid size-6 shrink-0 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800">
-                            {{ initials(creator) }}
-                        </span>
-                        <span class="truncate">{{ creator.name }}</span>
-                    </span>
-                    } @else {
-                    <span class="text-slate-500">Unknown user</span>
-                    }
-                </div>
-            </div>
+      <!-- ==================== EPIC ==================== -->
+      @else if (current(); as e) {
 
-            <!-- Created at (read-only) -->
-            <div>
-                <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Created at</span>
-                <div class="mt-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
-                    {{ e.created_at | date: 'MMM d, y' }}
-                </div>
-            </div>
-        </div>
+      <!-- Epic title -->
+      <section aria-labelledby="epic-title-label">
+        <label id="epic-title-label" for="epic-title" class="sr-only"> Epic title </label>
 
-        <!-- Tasks -->
-        <div class="mt-8 flex items-center justify-between">
-            <h3 class="text-base font-semibold text-slate-900">Tasks</h3>
-            <button type="button" class="text-sm font-medium text-blue-800 hover:underline">+ Add Task</button>
-        </div>
-        <div
-            class="mt-3 flex flex-col items-center gap-3 rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/50 px-4 py-10 text-center">
-            <p class="text-sm text-slate-800">No tasks have been added to this epic yet</p>
-            <button type="button"
-                class="rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900">
-                + Add Task
-            </button>
-        </div>
-        } @else {
-        <!-- Not found -->
-        <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 text-center">
-            <p class="font-medium text-slate-800">This epic no longer exists.</p>
-            <button type="button" class="mt-4 text-sm font-medium text-blue-800 hover:underline"
-                (click)="closed.emit()">
-                Back to epics
-            </button>
-        </div>
+        <input
+          #titleInput
+          id="epic-title"
+          type="text"
+          required
+          maxlength="200"
+          autocomplete="off"
+          [value]="e.title"
+          [attr.aria-invalid]="titleError()"
+          class="w-full rounded-lg border bg-white px-3 py-3 text-lg font-semibold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-700 focus:ring-2 focus:ring-blue-700/20"
+          [class.border-red-400]="titleError()"
+          [class.border-slate-200]="!titleError()"
+          (input)="titleError.set(false)"
+          (keydown.enter)="$event.preventDefault(); titleInput.blur()"
+          (blur)="saveTitle(titleInput, e)"
+        />
+
+        @if (titleError()) {
+        <p id="epic-title-error" role="alert" class="mt-1 text-xs text-red-600">
+          Title is required.
+        </p>
         }
-    </div>
+      </section>
+
+      <!-- Description -->
+      <section class="mt-4" aria-labelledby="epic-description-label">
+        <label id="epic-description-label" for="epic-description" class="sr-only">
+          Epic description
+        </label>
+
+        <textarea
+          #descInput
+          id="epic-description"
+          rows="5"
+          maxlength="500"
+          placeholder="No description provided"
+          [value]="e.description ?? ''"
+          class="min-h-32 w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-blue-700 focus:ring-2 focus:ring-blue-700/20"
+          (blur)="saveDescription(descInput, e)"
+        ></textarea>
+      </section>
+
+      <!-- ==================== METADATA ==================== -->
+      <section
+        class="mt-6 grid grid-cols-1 gap-x-3 gap-y-5 sm:grid-cols-2"
+        aria-label="Epic information"
+      >
+        <!-- Assignee -->
+        <div>
+          <label
+            for="epic-assignee"
+            class="text-[11px] font-semibold uppercase tracking-wide text-slate-500"
+          >
+            Assignee
+          </label>
+
+          <div
+            #assigneeBox
+            class="relative mt-1"
+            (focusout)="onAssigneeFocusOut($event, assigneeBox)"
+          >
+            <!-- Assignee trigger -->
+            <button
+              id="epic-assignee"
+              type="button"
+              aria-haspopup="listbox"
+              [attr.aria-expanded]="assigneeOpen()"
+              aria-label="Select epic assignee"
+              class="flex w-full items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-sm transition hover:border-slate-300 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+              (click)="toggleAssignee()"
+            >
+              @if (e.assignee; as assignee) {
+
+              <span class="flex min-w-0 items-center gap-2" [attr.title]="userTooltip(assignee)">
+                <span
+                  aria-hidden="true"
+                  class="grid size-6 shrink-0 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800"
+                >
+                  {{ initials(assignee) }}
+                </span>
+
+                <span class="truncate"> {{ assignee.name }} </span>
+              </span>
+
+              } @else {
+
+              <span class="text-slate-500"> Unassigned </span>
+
+              }
+
+              <img
+                src="assets/icons/arrow-up.svg"
+                alt=""
+                class="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 rotate-180"
+              />
+            </button>
+
+            <!-- Assignee options -->
+            @if (assigneeOpen()) {
+            <div class="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg bg-white shadow-lg">
+              @if (members.isLoading()) {
+              <div class="px-3 py-3 text-sm text-slate-500">Loading members...</div>
+              } @else if (members.error()) {
+              <div class="px-3 py-3 text-sm text-red-500">Couldn't load members</div>
+              } @else {
+              <ul>
+                <li>
+                  <button
+                    type="button"
+                    (click)="selectAssignee(null)"
+                    class="w-full px-3 py-2 text-left text-sm hover:bg-slate-50"
+                  >
+                    Unassigned
+                  </button>
+                </li>
+
+                @for (member of members.value(); track member.user_id) {
+                <li>
+                  <button
+                    type="button"
+                    (click)="selectAssignee(member)"
+                    class="w-full px-3 py-2 text-left text-sm hover:bg-slate-50"
+                  >
+                    {{ member.metadata.name || member.email }}
+                  </button>
+                </li>
+                }
+              </ul>
+              }
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Deadline -->
+        <div>
+          <label
+            for="epic-deadline"
+            class="text-[11px] font-semibold uppercase tracking-wide text-slate-500"
+          >
+            Deadline
+          </label>
+
+          <div class="relative">
+            <input
+              #deadlineInput
+              id="epic-deadline"
+              type="date"
+              [value]="e.deadline?.slice(0, 10) ?? ''"
+              class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pr-9 text-sm text-slate-900 outline-none transition focus:border-blue-700 focus:ring-2 focus:ring-blue-700/20 [&::-webkit-calendar-picker-indicator]:opacity-0"
+              (change)="saveDeadline(deadlineInput, e)"
+            />
+
+            <button
+              type="button"
+              class="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2"
+              (click)="openDatePicker(deadlineInput)"
+            >
+              <img src="assets/icons/calendar.svg" alt="Open calendar" class="size-3" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Created by -->
+        <div>
+          <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Created by
+          </span>
+
+          <div
+            class="mt-1 flex items-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
+          >
+            @if (e.created_by; as creator) {
+
+            <span class="flex min-w-0 items-center gap-2" [attr.title]="userTooltip(creator)">
+              <span
+                aria-hidden="true"
+                class="grid size-6 shrink-0 place-items-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-800"
+              >
+                {{ initials(creator) }}
+              </span>
+
+              <span class="truncate"> {{ creator.name }} </span>
+            </span>
+
+            } @else {
+
+            <span class="text-slate-500"> Unknown user </span>
+
+            }
+          </div>
+        </div>
+
+        <!-- Created at -->
+        <div>
+          <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Created at
+          </span>
+
+          <div class="mt-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+            {{ e.created_at | date: 'MMM d, y' }}
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TASKS ==================== -->
+      <section class="mt-8" aria-labelledby="epic-tasks-title">
+        <header class="flex items-center justify-between gap-4">
+          <h3 id="epic-tasks-title" class="text-base font-semibold text-slate-900">Tasks</h3>
+
+          <button
+            type="button"
+            class="text-sm font-medium text-blue-800 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+          >
+            + Add Task
+          </button>
+        </header>
+
+        <div
+          class="mt-3 flex flex-col items-center gap-3 rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/50 px-4 py-10 text-center"
+        >
+          <p class="text-sm text-slate-800">No tasks have been added to this epic yet</p>
+
+          <button
+            type="button"
+            class="rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
+          >
+            + Add Task
+          </button>
+        </div>
+      </section>
+
+      }
+
+      <!-- ==================== NOT FOUND ==================== -->
+      @else {
+
+      <div role="status" class="rounded-lg border border-slate-200 bg-slate-50 p-6 text-center">
+        <p class="font-medium text-slate-800">This epic no longer exists.</p>
+
+        <button
+          type="button"
+          class="mt-4 text-sm font-medium text-blue-800 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+          (click)="closed.emit()"
+        >
+          Back to epics
+        </button>
+      </div>
+
+      }
+    </main>
+  </div>
 </div>
