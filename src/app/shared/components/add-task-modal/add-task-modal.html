@@ -1,1 +1,288 @@
-<p>add-task-modal works!</p>
+<!-- Modal backdrop + container -->
+<div class="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
+  <!-- Accessible backdrop button -->
+  <button
+    type="button"
+    aria-label="Close Add Task modal"
+    class="absolute inset-0 cursor-default bg-slate-900/40 backdrop-blur-sm"
+    (click)="closeModal()"
+    [disabled]="submitting()"
+  ></button>
+
+  <!-- Dialog -->
+  <section
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="add-task-title"
+    class="relative z-10 flex max-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-lg bg-white shadow-2xl sm:flex-row"
+  >
+    <!-- Main form section -->
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col bg-white">
+      <header class="border-b border-slate-100 px-6 py-5">
+        <h2 id="add-task-title" class="text-xl font-semibold text-slate-900">Add New Task</h2>
+      </header>
+
+      <form class="flex min-h-0 flex-1 flex-col" (submit)="$event.preventDefault(); submitTask()">
+        <!-- Scrollable main fields -->
+        <div class="min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-5">
+          <!-- Title -->
+          <div>
+            <label
+              for="task-title"
+              class="mb-3 block text-xs font-semibold uppercase tracking-wide text-slate-600"
+            >
+              Title
+            </label>
+
+            <input
+              id="task-title"
+              type="text"
+              placeholder="e.g., Finalize structural schematics"
+              [formField]="taskForm.title"
+              [attr.aria-invalid]="taskForm.title().invalid()"
+              class="min-h-12 w-full rounded-xl border border-indigo-100 bg-white px-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+
+            @if (taskForm.title().invalid() && taskForm.title().touched()) {
+            <p class="mt-2 text-xs text-red-600">
+              @for (error of taskForm.title().errors(); track $index) { {{ error.message }} }
+            </p>
+            }
+          </div>
+
+          <!-- Description -->
+          <div class="flex min-h-48 flex-col sm:min-h-80">
+            <label
+              for="task-description"
+              class="mb-3 block text-xs font-semibold uppercase tracking-wide text-slate-600"
+            >
+              Description
+            </label>
+
+            <textarea
+              id="task-description"
+              placeholder="Provide detailed context for this task..."
+              [formField]="taskForm.description"
+              class="min-h-48 w-full flex-1 resize-y rounded-xl border border-indigo-100 bg-white p-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:min-h-80"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Desktop footer -->
+        <footer
+          class="hidden items-center justify-between border-t border-slate-100 bg-indigo-50/80 px-8 py-4 sm:flex"
+        >
+          <button
+            type="button"
+            (click)="closeModal()"
+            [disabled]="submitting()"
+            class="rounded-md bg-indigo-100 px-5 py-2.5 text-sm font-medium text-slate-800 transition hover:bg-indigo-200 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Close
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="submitting() || !taskForm().valid()"
+            class="min-w-32 rounded-md bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {{ submitting() ? 'Adding...' : 'Add Task' }}
+          </button>
+        </footer>
+      </form>
+    </div>
+
+    <!-- Metadata sidebar -->
+    <aside
+      class="min-h-0 w-full overflow-y-auto bg-indigo-50 px-6 py-5 sm:w-80 sm:shrink-0 sm:px-8"
+    >
+      <!-- Mobile header -->
+      <div class="mb-5 flex items-center justify-between sm:hidden">
+        <h3 class="text-lg font-semibold text-slate-900">Task details</h3>
+
+        <button
+          type="button"
+          aria-label="Close dialog"
+          (click)="closeModal()"
+          [disabled]="submitting()"
+          class="rounded-md p-2 text-slate-600 hover:bg-indigo-100 disabled:opacity-50"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="h-5 w-5"
+            aria-hidden="true"
+          >
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Status -->
+        <div>
+          <label
+            for="task-status"
+            class="mb-3 block text-xs font-semibold uppercase tracking-wide text-slate-600"
+          >
+            Status
+          </label>
+
+          <div class="relative">
+            <select
+              id="task-status"
+              [formField]="taskForm.status"
+              class="h-11 w-full appearance-none rounded-lg border border-indigo-100 bg-white px-3 pr-10 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+              @for (status of statuses; track status.value) {
+              <option [value]="status.value">{{ status.label }}</option>
+              }
+            </select>
+
+            <img
+              src="assets/icons/arrow-up.svg"
+              alt=""
+              aria-hidden="true"
+              class="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 rotate-180"
+            />
+          </div>
+        </div>
+
+        <!-- Assignee -->
+        <div>
+          <label
+            for="task-assignee"
+            class="mb-3 block text-xs font-semibold uppercase tracking-wide text-slate-600"
+          >
+            Assignee
+          </label>
+
+          <div class="relative">
+            <select
+              id="task-assignee"
+              [formField]="taskForm.assigneeId"
+              class="h-11 w-full appearance-none rounded-lg border border-indigo-100 bg-white px-3 pr-10 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+              <option value="">Select Team Member</option>
+
+              @for (member of members.value() ?? []; track member.user_id) {
+              <option [value]="member.user_id">{{ member.metadata.name }}</option>
+              }
+            </select>
+
+            <img
+              src="assets/icons/arrow-up.svg"
+              alt=""
+              aria-hidden="true"
+              class="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 rotate-180"
+            />
+          </div>
+
+          @if (members.isLoading()) {
+          <p class="mt-2 text-xs text-slate-500">Loading team members...</p>
+          } @if (members.error()) {
+          <p class="mt-2 text-xs text-red-600">Could not load team members.</p>
+          }
+        </div>
+
+        <!-- Epic -->
+        <div>
+          <label
+            for="task-epic"
+            class="mb-3 block text-xs font-semibold uppercase tracking-wide text-slate-600"
+          >
+            Epic
+          </label>
+
+          <div class="relative">
+            <select
+              id="task-epic"
+              [formField]="taskForm.epicId"
+              class="h-10 w-full appearance-none rounded-lg border border-indigo-100 bg-white px-3 pr-10 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+              <option value="">Select Epic</option>
+
+              @for (epic of epics.value() ?? []; track epic.epic_id) {
+              <option [value]="epic.id">
+                {{ epic.epic_id }} {{ epic.title.length > 100 ? epic.title.slice(0, 100) + '...' :
+                epic.title }}
+              </option>
+              }
+            </select>
+
+            <!-- Dropdown arrow -->
+            <img
+              src="assets/icons/arrow-up.svg"
+              alt=""
+              aria-hidden="true"
+              class="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 rotate-180"
+            />
+          </div>
+        </div>
+
+        <!-- Due Date -->
+        <div>
+          <label
+            for="task-due-date"
+            class="mb-3 block text-xs font-semibold uppercase tracking-wide text-slate-600"
+          >
+            Due Date
+          </label>
+
+          <div class="relative">
+            <input
+              id="task-due-date"
+              #dueDateInput
+              type="date"
+              [formField]="taskForm.dueDate"
+              class="h-11 w-full rounded-lg [&::-webkit-calendar-picker-indicator]:opacity-0 border border-indigo-100 bg-white py-2 pl-10 pr-10 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+
+            <!-- Calendar icon -->
+            <button
+              type="button"
+              aria-label="Open due date calendar"
+              class="absolute left-3 top-1/2 flex -translate-y-1/2 items-center justify-center"
+              (click)="openDatePicker(dueDateInput)"
+            >
+              <img src="assets/icons/calendar.svg" alt="" aria-hidden="true" class="size-4" />
+            </button>
+
+            <!-- Dropdown-style arrow -->
+            <img
+              src="assets/icons/arrow-up.svg"
+              alt=""
+              aria-hidden="true"
+              class="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 rotate-180"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      @if (submitError()) {
+      <p
+        role="alert"
+        class="mt-6 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+      >
+        {{ submitError() }}
+      </p>
+      }
+
+      <!-- Mobile footer -->
+      <div class="mt-6 sm:hidden">
+        <button
+          type="button"
+          (click)="submitTask()"
+          [disabled]="submitting() || !taskForm().valid()"
+          class="min-h-11 w-full rounded-md bg-blue-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ submitting() ? 'Adding...' : 'Add Task' }}
+        </button>
+      </div>
+    </aside>
+  </section>
+</div>

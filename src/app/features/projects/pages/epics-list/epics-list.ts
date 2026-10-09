@@ -11,7 +11,15 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { distinctUntilChanged, filter, finalize, map, Subject, Subscription, debounceTime } from 'rxjs';
+import {
+  distinctUntilChanged,
+  filter,
+  finalize,
+  map,
+  Subject,
+  Subscription,
+  debounceTime,
+} from 'rxjs';
 
 import { EpicModel } from '../../models/epic.model';
 import { EpicsService } from '../../services/epics.service';
@@ -19,9 +27,10 @@ import { EpicCard } from '../../../../shared/components/epic-card/epic-card';
 import { EpicCardSkeleton } from '../../../../shared/components/epic-card-skeleton/epic-card-skeleton';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EpicDetailsModal } from '../../../../shared/components/epic-details-modal/epic-details-modal';
+import { AddTaskModal } from '../../../../shared/components/add-task-modal/add-task-modal';
 
 @Component({
-  imports: [EpicCard, EpicCardSkeleton, RouterLink,EpicDetailsModal],
+  imports: [EpicCard, EpicCardSkeleton, RouterLink, EpicDetailsModal, AddTaskModal],
   selector: 'app-epics-list',
   styleUrl: './epics-list.css',
   templateUrl: './epics-list.html',
@@ -30,7 +39,7 @@ export class EpicsList implements OnInit, OnDestroy {
   private readonly epicsService = inject(EpicsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
-  readonly searchTerm = signal('');            // applied (debounced) term
+  readonly searchTerm = signal(''); // applied (debounced) term
   protected readonly searchInput = signal(''); // raw text in the input
   readonly offset = computed(() => (this.currentPage() - 1) * this.limit);
   protected readonly projectHasEpics = signal(false);
@@ -57,6 +66,20 @@ export class EpicsList implements OnInit, OnDestroy {
   private readonly mobileQuery = '(max-width: 767px)';
   private readonly dirty = signal(false);
   protected readonly selectedEpicId = signal<string | null>(null);
+  protected readonly showAddTaskModal = signal(false);
+
+  protected readonly initialEpicId = signal<string | null>(null);
+
+  protected openAddTaskModal(epicId: string | null = null): void {
+    this.initialEpicId.set(epicId);
+    this.selectedEpicId.set(null);
+    this.showAddTaskModal.set(true);
+  }
+
+  protected closeAddTaskModal(): void {
+    this.showAddTaskModal.set(false);
+    this.initialEpicId.set(null);
+  }
 
   @ViewChild('loadMoreSentinel')
   set loadMoreSentinel(element: ElementRef<HTMLElement> | undefined) {
@@ -103,9 +126,9 @@ export class EpicsList implements OnInit, OnDestroy {
     if (!projectId) return;
 
     if (append) {
-      if (this.activeRequest) return;   // don't stack "load more" requests
+      if (this.activeRequest) return; // don't stack "load more" requests
     } else {
-      this.requestSub?.unsubscribe();   // cancel the stale in-flight request (e.g. the previous search)
+      this.requestSub?.unsubscribe(); // cancel the stale in-flight request (e.g. the previous search)
     }
 
     const offset = (page - 1) * this.limit;
@@ -173,7 +196,6 @@ export class EpicsList implements OnInit, OnDestroy {
     this.currentPage.set(1); // offset becomes 0
     this.loadEpics(1);
   }
-
 
   protected onEpicUpdated(updated: EpicModel): void {
     this.epics.update((list) => list.map((e) => (e.id === updated.id ? { ...e, ...updated } : e)));

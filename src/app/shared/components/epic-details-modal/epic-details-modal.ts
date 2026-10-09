@@ -37,6 +37,7 @@ export class EpicDetailsModal {
   private readonly membersService = inject(MembersService);
   private readonly destroyRef = inject(DestroyRef);
 
+  readonly addTaskRequested = output<string>();
   private readonly dialog = viewChild.required<ElementRef<HTMLElement>>('dialog');
 
   private readonly previouslyFocused = document.activeElement as HTMLElement | null;

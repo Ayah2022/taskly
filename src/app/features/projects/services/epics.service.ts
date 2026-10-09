@@ -6,7 +6,6 @@ import { environment } from '../../../../environments/environment';
 import type { CreateEpicModel } from '../models/createEpic.model';
 import { EpicModel, EpicPatch } from '../models/epic.model';
 
-
 @Injectable({
   providedIn: 'root',
 })
@@ -54,6 +53,10 @@ export class EpicsService {
     });
   }
 
+  getProjectEpicsForTask(projectId: string): Observable<EpicModel[]> {
+    return this.getProjectEpics(projectId, 1000, 0).pipe(map((response) => response.body ?? []));
+  }
+
   updateEpic(id: string, patch: EpicPatch): Observable<void> {
     return this.http
       .patch<unknown[]>(`${this.baseUrl}/rest/v1/epics`, patch, {
@@ -67,7 +70,7 @@ export class EpicsService {
         }),
       );
   }
-  
+
   getEpicById(projectId: string, epicId: string): Observable<EpicModel | null> {
     const params = new HttpParams()
       .set('project_id', `eq.${projectId}`)
@@ -79,7 +82,6 @@ export class EpicsService {
       .get<EpicModel[]>(this.endpoint, { params })
       .pipe(map((rows) => rows[0] ?? null));
   }
-  
 }
 function escapeLike(term: string): string {
   return term.replace(/[\\%_]/g, '\\$&');

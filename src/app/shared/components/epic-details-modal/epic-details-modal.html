@@ -339,7 +339,8 @@
 
           <button
             type="button"
-            class="text-sm font-medium text-blue-800 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+            (click)="addTaskRequested.emit(epicId())"
+            class="text-sm font-medium cursor-pointer text-blue-800 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-700/20"
           >
             + Add Task
           </button>
@@ -352,7 +353,8 @@
 
           <button
             type="button"
-            class="rounded bg-blue-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
+            (click)="addTaskRequested.emit(epicId())"
+            class="rounded bg-blue-800 px-4 cursor-pointer py-2 text-sm font-medium text-white transition hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
           >
             + Add Task
           </button>
