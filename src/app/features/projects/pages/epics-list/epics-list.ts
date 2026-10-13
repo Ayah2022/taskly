@@ -5,7 +5,6 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
-  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -41,7 +40,7 @@ export class EpicsList implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   readonly searchTerm = signal(''); // applied (debounced) term
   protected readonly searchInput = signal(''); // raw text in the input
-  readonly offset = computed(() => (this.currentPage() - 1) * this.limit);
+  // readonly offset = computed(() => (this.currentPage() - 1) * this.limit);
   protected readonly projectHasEpics = signal(false);
   private readonly search$ = new Subject<string>();
   private requestSub?: Subscription;
@@ -164,6 +163,7 @@ export class EpicsList implements OnInit, OnDestroy {
             this.projectHasEpics.set(newEpics.length > 0 || this.totalCount() > 0);
           }
           if (append) {
+            //append to old epics the more one in mobile view
             this.epics.update((existing) => [...existing, ...newEpics]);
           } else {
             this.epics.set(newEpics);
@@ -193,12 +193,13 @@ export class EpicsList implements OnInit, OnDestroy {
     if (term === this.searchTerm()) return;
 
     this.searchTerm.set(term);
-    this.currentPage.set(1); // offset becomes 0
+    this.currentPage.set(1);
     this.loadEpics(1);
   }
 
   protected onEpicUpdated(updated: EpicModel): void {
     this.epics.update((list) => list.map((e) => (e.id === updated.id ? { ...e, ...updated } : e)));
+    //Whether an epic was updated and the list may need refreshing.
     this.dirty.set(true);
   }
 

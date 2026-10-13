@@ -43,7 +43,7 @@
     </p>
 
     <a
-      routerLink="/epics/new"
+      [routerLink]="['/projects', projectId(), 'epics', 'new']"
       class="mt-3 flex items-center gap-2 rounded-xs cursor-pointer bg-primary-gradient px-6 py-3 text-sm font-semibold text-white transition-all duration-200 ease-in-out hover:scale-[1.02]"
     >
       <img src="assets/icons/create-epic.svg" alt="" class="size-4" />
@@ -144,7 +144,7 @@
     [projectId]="pid"
     [initialEpicId]="initialEpicId()"
     (closed)="closeAddTaskModal()"
-    (created)="onTaskCreated($event)"
+    /* (created)="onTaskCreated($event)" */
   />
   } }
   <!-- Mobile loading indicator -->
