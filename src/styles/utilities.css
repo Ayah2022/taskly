@@ -77,6 +77,16 @@ select {
       width: 100%;
     }
   }
+    .width-70 {
+    width: 70%;
+    max-width: 986px;
+    @media (max-width: 1200px) {
+      width: 60%;
+    }
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
 
   @media (max-width: 767px) {
     .display-lg {
