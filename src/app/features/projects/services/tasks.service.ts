@@ -17,4 +17,15 @@ export class TasksService {
   createTask(payload: CreateTaskRequest): Observable<Task> {
     return this.http.post<Task>(this.endpoint, payload);
   }
+
+  getTasksByEpicId(epicId: string): Observable<Task[]> {
+    return this.http.get<Task[]>(
+      `${this.baseUrl}/rest/v1/project_tasks`,
+      {
+        params: {
+          epic_id: `eq.${epicId}`,
+        },
+      },
+    );
+  }
 }

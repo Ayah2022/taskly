@@ -16,7 +16,8 @@
   --color-slate-dark: var(--slate-dark);
   --color-slate-medium: var(--slate-medium);
   --color-slate-light: var(--slate-light);
-
+  --color-avatar-green:var(--avatar-green);
+  --color-avatar-grey:var(--avatar-grey);
   --color-success: var(--success);
   --color-error: var(--error);
   --color-warning: var(--warning);

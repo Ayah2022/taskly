@@ -1,8 +1,9 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import {
   afterNextRender,
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   ElementRef,
   inject,
@@ -22,9 +23,11 @@ import { EpicsService } from '../../../features/projects/services/epics.service'
 import { MembersService } from '../../../features/projects/services/members.service';
 import { MemberModel } from '../../../features/projects/models/member.model';
 
+import { TasksService } from '../../../features/projects/services/tasks.service';
+import type { Task } from '../../../features/projects/models/task.model';
 @Component({
   selector: 'app-epic-details-modal',
-  imports: [DatePipe],
+  imports: [DatePipe,NgClass],
   templateUrl: './epic-details-modal.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 
@@ -36,6 +39,8 @@ export class EpicDetailsModal {
   private readonly epicsService = inject(EpicsService);
   private readonly membersService = inject(MembersService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly tasksService = inject(TasksService);
+  today = new Date().toISOString().slice(0, 10);
 
   readonly addTaskRequested = output<string>();
   private readonly dialog = viewChild.required<ElementRef<HTMLElement>>('dialog');
@@ -57,6 +62,29 @@ export class EpicDetailsModal {
   protected readonly titleError = signal(false);
   protected readonly assigneeOpen = signal(false);
 
+  protected readonly avatarVariants = [
+    {
+      background: 'bg-avatar-green',
+      text: 'text-white',
+    },
+    {
+      background: 'bg-avatar-grey',
+      text: 'text-gray-dark',
+    },
+    {
+      background: 'bg-primary-container',
+      text: 'text-white',
+    },
+  ] as const;
+  protected taskAvatarVariant(taskId: string) {
+    const tasks = this.tasks.value() ?? [];
+    const index = tasks.findIndex(task => task.id === taskId);
+
+    return this.avatarVariants[
+      (index >= 0 ? index : 0) % this.avatarVariants.length
+    ];
+  }
+
   /**
    * Loads the epic details.
    */
@@ -69,6 +97,18 @@ export class EpicDetailsModal {
     stream: ({ params }) => this.epicsService.getEpicById(params.projectId, params.epicId),
   });
 
+  /**
+ * Loads tasks belonging to the current epic.
+ * Automatically refetches when epicId changes.
+ */
+  protected readonly tasks = rxResource<Task[], { epicId: string }>({
+    params: () => ({
+      epicId: this.epicId(),
+    }),
+
+    stream: ({ params }) =>
+      this.tasksService.getTasksByEpicId(params.epicId),
+  });
   /**
    * Local working copy.
    *
@@ -109,6 +149,7 @@ export class EpicDetailsModal {
     });
   }
 
+  
   // ============================================================
   // MODAL KEYBOARD HANDLING
   // ============================================================
@@ -327,8 +368,12 @@ export class EpicDetailsModal {
   // HELPERS
   // ============================================================
 
-  protected initials(user: EpicUser | null): string {
-    const words = (user?.name ?? '').trim().split(/\s+/).filter(Boolean);
+
+  protected initials(user: { name: string } | null): string {
+    const words = (user?.name ?? '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
 
     if (!words.length) {
       return '?';

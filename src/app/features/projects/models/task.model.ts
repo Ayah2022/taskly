@@ -1,3 +1,4 @@
+
 export type TaskStatus =
   | 'TO_DO'
   | 'IN_PROGRESS'
@@ -7,6 +8,19 @@ export type TaskStatus =
   | 'REOPENED'
   | 'READY_FOR_PRODUCTION'
   | 'DONE';
+
+export interface TaskUser {
+  id: string;
+  name: string;
+  email: string;
+  department: string | null;
+}
+
+export interface TaskEpic {
+  id: string;
+  title: string;
+  epic_id: string;
+}
 
 export interface CreateTaskRequest {
   project_id: string;
@@ -24,8 +38,12 @@ export interface Task {
   epic_id: string | null;
   title: string;
   description: string | null;
-  assignee_id: string | null;
-  due_date: string | null;
   status: TaskStatus;
-  created_at?: string;
+  created_at: string;
+  due_date: string | null;
+  task_id: string;
+
+  epic: TaskEpic | null;
+  created_by: TaskUser | null;
+  assignee: TaskUser | null;
 }

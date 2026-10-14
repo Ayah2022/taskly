@@ -70,7 +70,13 @@ export class AddTaskModal {
       message: 'Title is required.',
     });
   });
-
+  openDatePicker(input: HTMLInputElement): void {
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+    } else {
+      input.focus();
+    }
+  }
   protected readonly epics = resource({
     params: () => ({
       projectId: this.projectId(),
@@ -81,9 +87,6 @@ export class AddTaskModal {
     },
   });
 
-  protected openDatePicker(input: HTMLInputElement): void {
-    input.showPicker();
-  }
 
   protected readonly members = resource({
     params: () => ({

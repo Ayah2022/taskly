@@ -9,7 +9,7 @@
     </div>
   </div>
 
-  <div class="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
+  <div class="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 2xl:grid-cols-3">
     @for (item of [1, 2, 3, 4, 5, 6]; track item) {
     <app-epic-card-skeleton />
     }
@@ -92,9 +92,9 @@
     </div>
   </div>
 
+ 
   <!-- Epic cards -->
-  <!-- Epic cards -->
-  <div class="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
+  <div class="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 2xl:grid-cols-3">
     @if (isLoading()) { @for (item of [1, 2, 3, 4, 5, 6]; track item) {
     <app-epic-card-skeleton />
     } } @else if (hasError()) {

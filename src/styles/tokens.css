@@ -32,6 +32,10 @@
   --gray-dark: #51617e;
   --green-dark: #004e32;
   --pale-green: #00523599;
+
+  /* avatar bg colors */
+  --avatar-green:#006844;
+  --avatar-grey:#CDDDFF;
   /* === TYPOGRAPHY TOKENS === */
 
   --font-family:

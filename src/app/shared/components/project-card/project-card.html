@@ -1,5 +1,5 @@
 <div
-  class="relative flex h-full w-full flex-col rounded-lg border border-slate-200 bg-white p-5 transition hover:border-primary hover:shadow-sm"
+  class="relative flex h-full w-full flex-col rounded-lg  bg-white p-5 transition hover:border-primary hover:shadow-sm"
 >
   <!-- Stretched link: covers the whole card, but sits BEHIND the action row -->
 
@@ -8,7 +8,7 @@
     class="absolute inset-0 z-0"
     [attr.aria-label]="name()"
   ></a>
-  <h3 class="text-lg font-bold text-slate-900">
+  <h3 class="text-lg font-semibold text-slate-dark">
     {{ name().length > 26 ? (name() | slice: 0 : 26) + '...' : name() }}
   </h3>
 
