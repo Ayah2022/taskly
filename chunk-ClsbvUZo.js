@@ -1,1 +1,0 @@
-var o=[{path:``,pathMatch:`full`,loadComponent:()=>import(`./chunk-vc0xBoxr.js`).then(t=>t.EpicsList),data:{breadcrumb:`Epics`}},{path:`new`,loadComponent:()=>import(`./chunk-ydoED6N3.js`).then(t=>t.AddEpic),data:{breadcrumb:`New Epic`}}];export{o as EPICS_ROUTES};

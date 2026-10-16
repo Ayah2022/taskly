@@ -1,0 +1,1 @@
+import{Et as fh,R as HL,Rt as m,Z as Oh,cn as ze,k as F}from"./main-J2SYNERJ.js";var s=class e{http=m(fh);async getProjectMembers(r){let t=new ze().set(`project_id`,`eq.${r}`);return Oh(this.http.get(`${HL.apiUrl}/rest/v1/get_project_members`,{params:t}))}static ɵfac=function(t){return new(t||e)};static ɵprov=F({token:e,factory:e.ɵfac,providedIn:`root`})};export{s as t};
