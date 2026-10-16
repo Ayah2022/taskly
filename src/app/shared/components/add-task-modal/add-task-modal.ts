@@ -1,4 +1,14 @@
-import { Component, effect, inject, input, output, resource, signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  Input,
+  input,
+  output,
+  resource,
+  signal,
+  OnInit,
+} from '@angular/core';
 
 import { form, FormField, required } from '@angular/forms/signals';
 
@@ -25,7 +35,7 @@ interface CreateTaskFormModel {
   templateUrl: './add-task-modal.html',
   styleUrl: './add-task-modal.css',
 })
-export class AddTaskModal {
+export class AddTaskModal implements OnInit {
   private readonly tasksService = inject(TasksService);
   private readonly EpicsService = inject(EpicsService);
   private readonly membersService = inject(MembersService);
@@ -56,6 +66,7 @@ export class AddTaskModal {
     { value: 'DONE', label: 'Done' },
   ];
 
+  @Input() initialStatus: TaskStatus = 'TO_DO';
   protected readonly formModel = signal<CreateTaskFormModel>({
     title: '',
     description: '',
@@ -65,6 +76,12 @@ export class AddTaskModal {
     dueDate: '',
   });
 
+  ngOnInit(): void {
+    this.formModel.update((form) => ({
+      ...form,
+      status: this.initialStatus ?? 'TO_DO',
+    }));
+  }
   protected readonly taskForm = form(this.formModel, (path) => {
     required(path.title, {
       message: 'Title is required.',
@@ -86,7 +103,6 @@ export class AddTaskModal {
       return firstValueFrom(this.EpicsService.getProjectEpicsForTask(params.projectId));
     },
   });
-
 
   protected readonly members = resource({
     params: () => ({

@@ -3,7 +3,6 @@ import {
   afterNextRender,
   ChangeDetectionStrategy,
   Component,
-  computed,
   DestroyRef,
   ElementRef,
   inject,
@@ -27,7 +26,7 @@ import { TasksService } from '../../../features/projects/services/tasks.service'
 import type { Task } from '../../../features/projects/models/task.model';
 @Component({
   selector: 'app-epic-details-modal',
-  imports: [DatePipe,NgClass],
+  imports: [DatePipe, NgClass],
   templateUrl: './epic-details-modal.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 
@@ -78,11 +77,9 @@ export class EpicDetailsModal {
   ] as const;
   protected taskAvatarVariant(taskId: string) {
     const tasks = this.tasks.value() ?? [];
-    const index = tasks.findIndex(task => task.id === taskId);
+    const index = tasks.findIndex((task) => task.id === taskId);
 
-    return this.avatarVariants[
-      (index >= 0 ? index : 0) % this.avatarVariants.length
-    ];
+    return this.avatarVariants[(index >= 0 ? index : 0) % this.avatarVariants.length];
   }
 
   /**
@@ -98,16 +95,15 @@ export class EpicDetailsModal {
   });
 
   /**
- * Loads tasks belonging to the current epic.
- * Automatically refetches when epicId changes.
- */
+   * Loads tasks belonging to the current epic.
+   * Automatically refetches when epicId changes.
+   */
   protected readonly tasks = rxResource<Task[], { epicId: string }>({
     params: () => ({
       epicId: this.epicId(),
     }),
 
-    stream: ({ params }) =>
-      this.tasksService.getTasksByEpicId(params.epicId),
+    stream: ({ params }) => this.tasksService.getTasksByEpicId(params.epicId),
   });
   /**
    * Local working copy.
@@ -149,7 +145,6 @@ export class EpicDetailsModal {
     });
   }
 
-  
   // ============================================================
   // MODAL KEYBOARD HANDLING
   // ============================================================
@@ -368,12 +363,8 @@ export class EpicDetailsModal {
   // HELPERS
   // ============================================================
 
-
   protected initials(user: { name: string } | null): string {
-    const words = (user?.name ?? '')
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean);
+    const words = (user?.name ?? '').trim().split(/\s+/).filter(Boolean);
 
     if (!words.length) {
       return '?';

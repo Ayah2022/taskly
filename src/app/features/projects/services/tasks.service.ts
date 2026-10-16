@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-import { CreateTaskRequest, Task } from '../models/task.model';
+import { CreateTaskRequest, Task, TaskStatus } from '../models/task.model';
 
 @Injectable({
   providedIn: 'root',
@@ -13,19 +13,27 @@ export class TasksService {
 
   private readonly baseUrl = environment.apiUrl;
   private readonly endpoint = `${this.baseUrl}/rest/v1/tasks`;
+  private readonly projectTasksEndpoint = `${this.baseUrl}/rest/v1/project_tasks`;
 
   createTask(payload: CreateTaskRequest): Observable<Task> {
     return this.http.post<Task>(this.endpoint, payload);
   }
 
   getTasksByEpicId(epicId: string): Observable<Task[]> {
-    return this.http.get<Task[]>(
-      `${this.baseUrl}/rest/v1/project_tasks`,
-      {
-        params: {
-          epic_id: `eq.${epicId}`,
-        },
+    return this.http.get<Task[]>(this.projectTasksEndpoint, {
+      params: {
+        epic_id: `eq.${epicId}`,
       },
-    );
+    });
+  }
+
+  getTasksByProjectAndStatus(projectId: string, status: TaskStatus): Observable<Task[]> {
+    const params = new HttpParams()
+      .set('project_id', `eq.${projectId}`)
+      .set('status', `eq.${status}`);
+
+    return this.http.get<Task[]>(this.projectTasksEndpoint, {
+      params,
+    });
   }
 }
