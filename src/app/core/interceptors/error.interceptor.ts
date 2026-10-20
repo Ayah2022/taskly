@@ -1,8 +1,19 @@
+import { inject } from '@angular/core';
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
+import { StorageService } from '../services/storage.service';
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  //globally observing/handling HTTP errors
+  const router = inject(Router);
+  const storageService = inject(StorageService);
+
+  const isPublicAuthRequest =
+    req.url.includes('/auth/v1/token') ||
+    req.url.includes('/auth/v1/signup') ||
+    req.url.includes('/auth/v1/recover');
+
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       console.error('API Error:', {
@@ -19,6 +30,17 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
         case 401:
           console.error('Unauthorized');
+
+          // Don't redirect for invalid login/signup/recovery requests.
+          if (!isPublicAuthRequest) {
+            storageService.clearSession();
+
+            if (router.url !== '/login') {
+              void router.navigateByUrl('/login', {
+                replaceUrl: true,
+              });
+            }
+          }
           break;
 
         case 403:

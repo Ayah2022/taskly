@@ -66,20 +66,6 @@ export const PROJECTS_ROUTES: Routes = [
         data: {
           breadcrumb: 'Tasks',
         },
-
-        //   children: [
-        //     // /projects/:projectId/tasks/add
-        //     {
-        //       path: 'add',
-        //       loadComponent: () =>
-        //         import('./pages/add-task/add-task').then(
-        //           (component) => component.AddTask,
-        //         ),
-        //       data: {
-        //         breadcrumb: 'New Task',
-        //       },
-        //     },
-        //   ],
       },
 
       // /projects/:projectId/members

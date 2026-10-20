@@ -60,11 +60,11 @@ export class Breadcrumb implements OnInit {
       }
 
       let label = breadcrumb;
-      console.log({
-        routePath,
-        breadcrumb,
-        resolvedData: route.snapshot.data,
-      });
+      // console.log('bread crumb', {
+      //   routePath,
+      //   breadcrumb,
+      //   resolvedData: route.snapshot.data,
+      // });
       // Dynamic project name
       if (breadcrumb === 'project') {
         const project = route.snapshot.data['project'];

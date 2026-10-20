@@ -82,6 +82,7 @@ export class AddTaskModal implements OnInit {
       status: this.initialStatus ?? 'TO_DO',
     }));
   }
+
   protected readonly taskForm = form(this.formModel, (path) => {
     required(path.title, {
       message: 'Title is required.',
@@ -120,14 +121,17 @@ export class AddTaskModal implements OnInit {
       const initialEpicId = this.initialEpicId();
       const availableEpics = this.epics.value();
 
+      console.log('Selected Epic ID:', this.formModel().epicId);
+
       if (availableEpics === undefined) {
         return;
       }
 
       const epicExists = availableEpics.some((epic) => epic.id === initialEpicId);
 
-      this.taskForm.epicId().value.set(epicExists && initialEpicId ? initialEpicId : '');
-      console.log('here', this.taskForm.epicId().value());
+      this.taskForm
+        .epicId()
+        .value.set(epicExists && initialEpicId ? initialEpicId : this.taskForm.epicId().value());
     });
   }
 
@@ -149,7 +153,7 @@ export class AddTaskModal implements OnInit {
     }
 
     const values = this.formModel();
-
+    console.log('values', values);
     const payload: CreateTaskRequest = {
       project_id: this.projectId(),
       title,
