@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
@@ -24,6 +24,18 @@ export class TasksService {
       params: {
         epic_id: `eq.${epicId}`,
       },
+    });
+  }
+
+  getTaskDetails(projectId: string, taskId: string): Observable<HttpResponse<Task[]>> {
+    const params = new HttpParams()
+      .set('project_id', `eq.${projectId}`)
+      .set('id', `eq.${taskId}`)
+      .set('select', '*');
+
+    return this.http.get<Task[]>(this.projectTasksEndpoint, {
+      params,
+      observe: 'response',
     });
   }
 

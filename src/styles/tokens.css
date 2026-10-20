@@ -17,6 +17,8 @@
   --surface-low: #f1f3ff;
   --background: #f9f9ff;
 
+  --gray-light: #e8edff;
+
   /* Slate neutrals */
   --slate-dark: #041b3c;
   --slate-medium: #4f5f7b;
@@ -34,8 +36,8 @@
   --pale-green: #00523599;
 
   /* avatar bg colors */
-  --avatar-green:#006844;
-  --avatar-grey:#CDDDFF;
+  --avatar-green: #006844;
+  --avatar-grey: #cdddff;
   /* === TYPOGRAPHY TOKENS === */
 
   --font-family:

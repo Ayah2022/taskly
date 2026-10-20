@@ -157,7 +157,7 @@
 
           <div class="flex flex-col gap-3 p-3">
             @for (task of column.tasks; track task.id) {
-            <app-task-card [task]="task" [showStatus]="false" />
+            <app-task-card [task]="task" [showStatus]="false" (click)="openTaskDetails(task.id)" />
             }
           </div>
 
@@ -168,7 +168,7 @@
     </div>
   </main>
 
-  <!-- Existing Add Task Modal -->
+  <!--  Add Task Modal -->
   @if (addTaskOpen() && projectId(); as id) {
   <app-add-task-modal
     [projectId]="id"
@@ -177,4 +177,10 @@
     (created)="onTaskCreated()"
   />
   }
+
+  <!--   Task Details Modal -->
+
+  @if (showTaskDetails() && selectedTaskId(); as taskId) { @if (projectId(); as project) {
+  <app-task-details-modal [projectId]="project" [taskId]="taskId" (closed)="closeTaskDetails()" />
+  } }
 </div>

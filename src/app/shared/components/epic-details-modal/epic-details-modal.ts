@@ -24,9 +24,10 @@ import { MemberModel } from '../../../features/projects/models/member.model';
 
 import { TasksService } from '../../../features/projects/services/tasks.service';
 import type { Task } from '../../../features/projects/models/task.model';
+import { TaskDetailsModal } from '../task-details-modal/task-details-modal';
 @Component({
   selector: 'app-epic-details-modal',
-  imports: [DatePipe, NgClass],
+  imports: [DatePipe, NgClass, TaskDetailsModal],
   templateUrl: './epic-details-modal.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 
@@ -50,6 +51,8 @@ export class EpicDetailsModal {
   readonly epicId = input.required<string>();
 
   readonly closed = output<void>();
+  protected readonly showTaskDetails = signal(false);
+  protected readonly selectedTaskId = signal<string | null>(null);
 
   /**
    * Emits the updated epic after every successful save.
@@ -145,6 +148,18 @@ export class EpicDetailsModal {
     });
   }
 
+  protected openTaskDetails(taskId: string): void {
+    if (!this.projectId()) {
+      return;
+    }
+
+    this.selectedTaskId.set(taskId);
+    this.showTaskDetails.set(true);
+  }
+  protected closeTaskDetails(): void {
+    this.showTaskDetails.set(false);
+    this.selectedTaskId.set(null);
+  }
   // ============================================================
   // MODAL KEYBOARD HANDLING
   // ============================================================

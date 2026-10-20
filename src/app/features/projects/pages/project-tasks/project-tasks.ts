@@ -7,6 +7,7 @@ import { Task, TaskStatus } from '../../models/task.model';
 import { AddTaskModal } from '../../../../shared/components/add-task-modal/add-task-modal';
 
 import { TaskCardComponent } from '../../../../shared/components/task-card/task-card';
+import { TaskDetailsModal } from '../../../../shared/components/task-details-modal/task-details-modal';
 
 interface BoardColumn {
   status: TaskStatus;
@@ -22,7 +23,7 @@ interface BoardColumn {
 @Component({
   selector: 'app-project-tasks',
   standalone: true,
-  imports: [AddTaskModal, TaskCardComponent],
+  imports: [AddTaskModal, TaskCardComponent, TaskDetailsModal],
   templateUrl: './project-tasks.html',
 })
 export class ProjectTasks implements OnInit {
@@ -32,6 +33,8 @@ export class ProjectTasks implements OnInit {
   readonly projectId = signal<string | null>(null);
   readonly addTaskOpen = signal(false);
   readonly selectedStatus = signal<TaskStatus>('TO_DO');
+  protected readonly showTaskDetails = signal(false);
+  protected readonly selectedTaskId = signal<string | null>(null);
 
   readonly columns = signal<BoardColumn[]>([
     {
@@ -179,6 +182,18 @@ export class ProjectTasks implements OnInit {
     });
   }
 
+  protected openTaskDetails(taskId: string): void {
+    if (!this.projectId()) {
+      return;
+    }
+
+    this.selectedTaskId.set(taskId);
+    this.showTaskDetails.set(true);
+  }
+  protected closeTaskDetails(): void {
+    this.showTaskDetails.set(false);
+    this.selectedTaskId.set(null);
+  }
   openAddTask(status: TaskStatus = 'TO_DO'): void {
     console.log(status, 'status');
     this.selectedStatus.set(status);

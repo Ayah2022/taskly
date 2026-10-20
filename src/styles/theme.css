@@ -4,6 +4,7 @@
   --background-image-primary-gradient: var(--primary-gradient);
   --color-primary: var(--primary);
   --color-gray-dark: var(--gray-dark);
+  --color-gray-light: var(--gray-light);
   --color-primary-light: var(--primary-light);
   --color-primary-container: var(--primary-container);
   --color-pale-green: var(--pale-green);
@@ -16,8 +17,8 @@
   --color-slate-dark: var(--slate-dark);
   --color-slate-medium: var(--slate-medium);
   --color-slate-light: var(--slate-light);
-  --color-avatar-green:var(--avatar-green);
-  --color-avatar-grey:var(--avatar-grey);
+  --color-avatar-green: var(--avatar-green);
+  --color-avatar-grey: var(--avatar-grey);
   --color-success: var(--success);
   --color-error: var(--error);
   --color-warning: var(--warning);
