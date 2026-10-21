@@ -40,11 +40,6 @@ export class Sidebar implements OnInit {
     });
   }
 
-  closeSidebarOnMobile(): void {
-    if (window.matchMedia('(max-width: 767px)').matches) {
-      this.closeMobileMenu.emit();
-    }
-  }
   private updateActiveProject(): void {
     const project = this.getActiveProject();
 
