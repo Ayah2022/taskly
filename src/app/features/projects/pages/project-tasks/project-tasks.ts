@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 import { TasksService } from '../../services/tasks.service';
 import { Task, TaskStatus } from '../../models/task.model';
@@ -18,6 +18,11 @@ interface BoardColumn {
   tasks: Task[];
   loading: boolean;
   error: string | null;
+  offset: number;
+  totalCount: number | null;
+  loadingMore: boolean;
+  hasMore: boolean;
+  loadMoreError: string | null;
 }
 
 @Component({
@@ -36,6 +41,15 @@ export class ProjectTasks implements OnInit {
   protected readonly showTaskDetails = signal(false);
   protected readonly selectedTaskId = signal<string | null>(null);
 
+  private readonly pageSize = 10;
+  readonly mobileTasks = signal<Task[]>([]);
+  readonly mobileOffset = signal(0);
+  readonly mobileTotalCount = signal<number | null>(null);
+  readonly mobileLoading = signal(false);
+  readonly mobileLoadingMore = signal(false);
+  readonly mobileHasMore = signal(true);
+  readonly mobileError = signal<string | null>(null);
+
   readonly columns = signal<BoardColumn[]>([
     {
       status: 'TO_DO',
@@ -44,8 +58,13 @@ export class ProjectTasks implements OnInit {
       dotClass: 'bg-slate-400',
       countClass: 'bg-blue-100 text-blue-900',
       tasks: [],
-      loading: true,
+      loading: false,
       error: null,
+      offset: 0,
+      totalCount: null,
+      loadingMore: false,
+      hasMore: true,
+      loadMoreError: null,
     },
     {
       status: 'IN_PROGRESS',
@@ -54,8 +73,13 @@ export class ProjectTasks implements OnInit {
       dotClass: 'bg-blue-600',
       countClass: 'bg-blue-100 text-blue-900',
       tasks: [],
-      loading: true,
+      loading: false,
       error: null,
+      offset: 0,
+      totalCount: null,
+      loadingMore: false,
+      hasMore: true,
+      loadMoreError: null,
     },
     {
       status: 'BLOCKED',
@@ -64,8 +88,13 @@ export class ProjectTasks implements OnInit {
       dotClass: 'bg-red-600',
       countClass: 'bg-red-100 text-red-800',
       tasks: [],
-      loading: true,
+      loading: false,
       error: null,
+      offset: 0,
+      totalCount: null,
+      loadingMore: false,
+      hasMore: true,
+      loadMoreError: null,
     },
     {
       status: 'IN_REVIEW',
@@ -74,8 +103,13 @@ export class ProjectTasks implements OnInit {
       dotClass: 'bg-slate-600',
       countClass: 'bg-slate-200 text-slate-800',
       tasks: [],
-      loading: true,
+      loading: false,
       error: null,
+      offset: 0,
+      totalCount: null,
+      loadingMore: false,
+      hasMore: true,
+      loadMoreError: null,
     },
     {
       status: 'READY_FOR_QA',
@@ -84,8 +118,13 @@ export class ProjectTasks implements OnInit {
       dotClass: 'bg-purple-600',
       countClass: 'bg-purple-100 text-purple-800',
       tasks: [],
-      loading: true,
+      loading: false,
       error: null,
+      offset: 0,
+      totalCount: null,
+      loadingMore: false,
+      hasMore: true,
+      loadMoreError: null,
     },
     {
       status: 'REOPENED',
@@ -94,8 +133,13 @@ export class ProjectTasks implements OnInit {
       dotClass: 'bg-orange-500',
       countClass: 'bg-orange-100 text-orange-800',
       tasks: [],
-      loading: true,
+      loading: false,
       error: null,
+      offset: 0,
+      totalCount: null,
+      loadingMore: false,
+      hasMore: true,
+      loadMoreError: null,
     },
     {
       status: 'READY_FOR_PRODUCTION',
@@ -104,8 +148,13 @@ export class ProjectTasks implements OnInit {
       dotClass: 'bg-teal-600',
       countClass: 'bg-teal-100 text-teal-800',
       tasks: [],
-      loading: true,
+      loading: false,
       error: null,
+      offset: 0,
+      totalCount: null,
+      loadingMore: false,
+      hasMore: true,
+      loadMoreError: null,
     },
     {
       status: 'DONE',
@@ -114,13 +163,17 @@ export class ProjectTasks implements OnInit {
       dotClass: 'bg-green-600',
       countClass: 'bg-green-100 text-green-800',
       tasks: [],
-      loading: true,
+      loading: false,
       error: null,
+      offset: 0,
+      totalCount: null,
+      loadingMore: false,
+      hasMore: true,
+      loadMoreError: null,
     },
   ]);
 
   ngOnInit(): void {
-    // Keep the existing project route convention.
     const projectRoute = this.route.parent;
     const projectId = projectRoute?.snapshot.paramMap.get('projectId');
     const project = projectRoute?.snapshot.data['project'];
@@ -137,33 +190,66 @@ export class ProjectTasks implements OnInit {
     }
 
     this.projectId.set(projectId);
+
+    // Load the desktop board columns.
     this.loadBoard();
+
+    // If the initial viewport is mobile, load its independent task list too.
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      this.loadMobilePage();
+    }
   }
 
   loadBoard(): void {
+    console.log('loadBoard called', this.projectId());
+
     for (const column of this.columns()) {
+      console.log('Loading column:', column.status);
       this.loadColumn(column.status);
     }
   }
 
-  loadColumn(status: TaskStatus): void {
+  loadColumn(status: TaskStatus, append = false): void {
     const projectId = this.projectId();
+    const currentColumn = this.columns().find((column) => column.status === status);
 
-    if (!projectId) {
+    if (!projectId || !currentColumn) return;
+
+    if (append) {
+      if (currentColumn.loading || currentColumn.loadingMore || !currentColumn.hasMore) {
+        return;
+      }
+    } else if (currentColumn.loading) {
       return;
     }
 
+    const offset = append ? currentColumn.offset : 0;
+
     this.updateColumn(status, {
-      loading: true,
-      error: null,
+      ...(append ? { loadingMore: true, loadMoreError: null } : { loading: false, error: null }),
     });
 
-    this.tasksService.getTasksByProjectAndStatus(projectId, status).subscribe({
-      next: (tasks) => {
+    this.tasksService.getTasksPage(projectId, this.pageSize, offset, status).subscribe({
+      next: (response) => {
+        const page = response.body ?? [];
+        const total = this.parseTotalCount(response);
+
+        // Read the latest column state after the request completes.
+        const latestColumn = this.columns().find((column) => column.status === status);
+
+        if (!latestColumn) return;
+
         this.updateColumn(status, {
-          tasks,
+          tasks: append
+            ? this.mergeUniqueTasks(latestColumn.tasks, page)
+            : this.mergeUniqueTasks([], page),
+          offset: offset + page.length,
+          totalCount: total ?? latestColumn.totalCount,
+          hasMore: total !== null ? offset + page.length < total : page.length === this.pageSize,
           loading: false,
+          loadingMore: false,
           error: null,
+          loadMoreError: null,
         });
       },
       error: (error: HttpErrorResponse) => {
@@ -176,8 +262,85 @@ export class ProjectTasks implements OnInit {
 
         this.updateColumn(status, {
           loading: false,
-          error: message,
+          loadingMore: false,
+          ...(append ? { loadMoreError: message } : { error: message }),
         });
+      },
+    });
+  }
+
+  //helper to prevent duplicates
+
+  private mergeUniqueTasks(existing: Task[], incoming: Task[]): Task[] {
+    const tasksById = new Map<string, Task>();
+
+    for (const task of existing) {
+      tasksById.set(task.id, task);
+    }
+
+    for (const task of incoming) {
+      if (!tasksById.has(task.id)) {
+        tasksById.set(task.id, task);
+      }
+    }
+
+    return [...tasksById.values()];
+  }
+
+  loadMobilePage(append = false): void {
+    const projectId = this.projectId();
+
+    if (!projectId) return;
+
+    if (this.mobileLoading() || this.mobileLoadingMore() || !this.mobileHasMore()) {
+      return;
+    }
+
+    if (append) {
+      this.mobileLoadingMore.set(true);
+      this.mobileError.set(null);
+    } else {
+      this.mobileLoading.set(true);
+      this.mobileError.set(null);
+    }
+
+    const offset = append ? this.mobileOffset() : 0;
+
+    this.tasksService.getTasksPage(projectId, this.pageSize, offset).subscribe({
+      next: (response) => {
+        const page = response.body ?? [];
+        const total = this.parseTotalCount(response);
+
+        this.mobileTasks.update((existing) =>
+          append ? this.mergeUniqueTasks(existing, page) : this.mergeUniqueTasks([], page),
+        );
+
+        this.mobileOffset.set(offset + page.length);
+
+        if (total !== null) {
+          this.mobileTotalCount.set(total);
+        }
+
+        const knownTotal = total ?? this.mobileTotalCount();
+
+        this.mobileHasMore.set(
+          knownTotal !== null ? offset + page.length < knownTotal : page.length === this.pageSize,
+        );
+
+        this.mobileLoading.set(false);
+        this.mobileLoadingMore.set(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.mobileLoading.set(false);
+        this.mobileLoadingMore.set(false);
+
+        this.mobileError.set(
+          error.status === 401
+            ? 'Your session may have expired. Please sign in again.'
+            : error.status === 403
+              ? 'You do not have permission to view these tasks.'
+              : 'Unable to load tasks. Please try again.',
+        );
       },
     });
   }
@@ -212,9 +375,54 @@ export class ProjectTasks implements OnInit {
     this.loadBoard();
   }
 
+  onColumnScroll(event: Event, status: TaskStatus): void {
+    const element = event.target as HTMLElement;
+
+    const remaining = element.scrollHeight - element.scrollTop - element.clientHeight;
+
+    if (remaining < 100) {
+      this.loadColumn(status, true);
+    }
+  }
+
+  onMobileScroll(event: Event): void {
+    const element = event.target as HTMLElement;
+
+    const remaining = element.scrollHeight - element.scrollTop - element.clientHeight;
+
+    if (remaining < 150) {
+      this.loadMobilePage(true);
+    }
+  }
+
+  /** Show the mobile error state if every column failed and no tasks loaded. */
+  mobileHasErrors(): boolean {
+    const columns = this.columns();
+
+    return columns.length > 0 && columns.every((column) => column.error !== null);
+  }
+
   private updateColumn(status: TaskStatus, changes: Partial<BoardColumn>): void {
     this.columns.update((columns) =>
       columns.map((column) => (column.status === status ? { ...column, ...changes } : column)),
     );
+  }
+
+  private parseTotalCount(response: HttpResponse<Task[]>): number | null {
+    const contentRange = response.headers.get('Content-Range');
+
+    if (!contentRange) {
+      return null;
+    }
+
+    const match = contentRange.trim().match(/^\d+-\d+\/(\d+|\*)$/);
+
+    if (!match || match[1] === '*') {
+      return null;
+    }
+
+    const total = Number(match[1]);
+
+    return Number.isSafeInteger(total) && total >= 0 ? total : null;
   }
 }

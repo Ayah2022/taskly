@@ -39,6 +39,27 @@ export class TasksService {
     });
   }
 
+  getTasksPage(
+    projectId: string,
+    limit: number,
+    offset: number,
+    status?: TaskStatus,
+  ): Observable<HttpResponse<Task[]>> {
+    let params = new HttpParams()
+      .set('project_id', `eq.${projectId}`)
+      .set('limit', limit)
+      .set('offset', offset);
+
+    if (status) {
+      params = params.set('status', `eq.${status}`);
+    }
+
+    return this.http.get<Task[]>(this.projectTasksEndpoint, {
+      params,
+      observe: 'response',
+    });
+  }
+
   getTasksByProjectAndStatus(projectId: string, status: TaskStatus): Observable<Task[]> {
     const params = new HttpParams()
       .set('project_id', `eq.${projectId}`)
