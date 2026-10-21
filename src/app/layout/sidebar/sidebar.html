@@ -239,6 +239,7 @@
           routerLinkActive="bg-white text-primary"
           #rla="routerLinkActive"
           (click)="closeMobileMenu.emit()"
+          [routerLinkActiveOptions]="{ exact: true }"
           class="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-slate-dark transition"
         >
           <img
