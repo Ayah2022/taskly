@@ -31,6 +31,8 @@
           placeholder="Search tasks..."
           aria-label="Search tasks"
           class="min-w-0 w-full bg-transparent text-sm outline-none placeholder:text-slate-500"
+          [value]="searchTerm()"
+          (input)="onSearchInput($event)"
         />
       </label>
     </div>

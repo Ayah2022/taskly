@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
@@ -6,6 +6,8 @@ import { TasksService } from '../../services/tasks.service';
 import { Task, TaskStatus } from '../../models/task.model';
 import { AddTaskModal } from '../../../../shared/components/add-task-modal/add-task-modal';
 
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TaskCardComponent } from '../../../../shared/components/task-card/task-card';
 import { TaskDetailsModal } from '../../../../shared/components/task-details-modal/task-details-modal';
 
@@ -49,6 +51,15 @@ export class ProjectTasks implements OnInit {
   readonly mobileLoadingMore = signal(false);
   readonly mobileHasMore = signal(true);
   readonly mobileError = signal<string | null>(null);
+
+  private readonly destroyRef = inject(DestroyRef);
+
+  readonly searchTerm = signal('');
+
+  private readonly searchInput$ = new Subject<string>();
+
+  // Identifies the latest search, so older requests cannot overwrite it.
+  private searchVersion = 0;
 
   readonly columns = signal<BoardColumn[]>([
     {
@@ -173,6 +184,14 @@ export class ProjectTasks implements OnInit {
     },
   ]);
 
+  constructor() {
+    this.searchInput$
+      .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((term) => {
+        this.applySearch(term);
+      });
+  }
+
   ngOnInit(): void {
     const projectRoute = this.route.parent;
     const projectId = projectRoute?.snapshot.paramMap.get('projectId');
@@ -200,6 +219,49 @@ export class ProjectTasks implements OnInit {
     }
   }
 
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    this.searchInput$.next(input.value.trim());
+  }
+
+  private applySearch(term: string): void {
+    this.searchTerm.set(term);
+
+    // Invalidate responses belonging to the previous search.
+    this.searchVersion++;
+
+    // Reset desktop pagination and remove results from the previous search.
+    this.columns.update((columns) =>
+      columns.map((column) => ({
+        ...column,
+        tasks: [],
+        loading: false,
+        error: null,
+        offset: 0,
+        totalCount: null,
+        loadingMore: false,
+        hasMore: true,
+        loadMoreError: null,
+      })),
+    );
+
+    // Reset mobile pagination as well.
+    this.mobileTasks.set([]);
+    this.mobileOffset.set(0);
+    this.mobileTotalCount.set(null);
+    this.mobileLoading.set(false);
+    this.mobileLoadingMore.set(false);
+    this.mobileHasMore.set(true);
+    this.mobileError.set(null);
+
+    // Reload with the latest term. An empty term fetches all project tasks.
+    this.loadBoard();
+
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      this.loadMobilePage();
+    }
+  }
   loadBoard(): void {
     console.log('loadBoard called', this.projectId());
 
@@ -228,45 +290,53 @@ export class ProjectTasks implements OnInit {
     this.updateColumn(status, {
       ...(append ? { loadingMore: true, loadMoreError: null } : { loading: false, error: null }),
     });
+    const requestVersion = this.searchVersion;
+    this.tasksService
+      .getTasksPage(projectId, this.pageSize, offset, status, this.searchTerm())
+      .subscribe({
+        next: (response) => {
+          if (requestVersion !== this.searchVersion) {
+            return;
+          }
+          const page = response.body ?? [];
+          const total = this.parseTotalCount(response);
 
-    this.tasksService.getTasksPage(projectId, this.pageSize, offset, status).subscribe({
-      next: (response) => {
-        const page = response.body ?? [];
-        const total = this.parseTotalCount(response);
+          // Read the latest column state after the request completes.
+          const latestColumn = this.columns().find((column) => column.status === status);
 
-        // Read the latest column state after the request completes.
-        const latestColumn = this.columns().find((column) => column.status === status);
+          if (!latestColumn) return;
 
-        if (!latestColumn) return;
+          this.updateColumn(status, {
+            tasks: append
+              ? this.mergeUniqueTasks(latestColumn.tasks, page)
+              : this.mergeUniqueTasks([], page),
+            offset: offset + page.length,
+            totalCount: total ?? latestColumn.totalCount,
+            hasMore: total !== null ? offset + page.length < total : page.length === this.pageSize,
+            loading: false,
+            loadingMore: false,
+            error: null,
+            loadMoreError: null,
+          });
+        },
+        error: (error: HttpErrorResponse) => {
+          if (requestVersion !== this.searchVersion) {
+            return;
+          }
+          const message =
+            error.status === 401
+              ? 'Your session may have expired. Please sign in again.'
+              : error.status === 403
+                ? 'You do not have permission to view these tasks.'
+                : 'Unable to load tasks. Please try again.';
 
-        this.updateColumn(status, {
-          tasks: append
-            ? this.mergeUniqueTasks(latestColumn.tasks, page)
-            : this.mergeUniqueTasks([], page),
-          offset: offset + page.length,
-          totalCount: total ?? latestColumn.totalCount,
-          hasMore: total !== null ? offset + page.length < total : page.length === this.pageSize,
-          loading: false,
-          loadingMore: false,
-          error: null,
-          loadMoreError: null,
-        });
-      },
-      error: (error: HttpErrorResponse) => {
-        const message =
-          error.status === 401
-            ? 'Your session may have expired. Please sign in again.'
-            : error.status === 403
-              ? 'You do not have permission to view these tasks.'
-              : 'Unable to load tasks. Please try again.';
-
-        this.updateColumn(status, {
-          loading: false,
-          loadingMore: false,
-          ...(append ? { loadMoreError: message } : { error: message }),
-        });
-      },
-    });
+          this.updateColumn(status, {
+            loading: false,
+            loadingMore: false,
+            ...(append ? { loadMoreError: message } : { error: message }),
+          });
+        },
+      });
   }
 
   //helper to prevent duplicates
@@ -305,44 +375,52 @@ export class ProjectTasks implements OnInit {
     }
 
     const offset = append ? this.mobileOffset() : 0;
+    const requestVersion = this.searchVersion;
+    this.tasksService
+      .getTasksPage(projectId, this.pageSize, offset, undefined, this.searchTerm())
+      .subscribe({
+        next: (response) => {
+          if (requestVersion !== this.searchVersion) {
+            return;
+          }
+          const page = response.body ?? [];
+          const total = this.parseTotalCount(response);
 
-    this.tasksService.getTasksPage(projectId, this.pageSize, offset).subscribe({
-      next: (response) => {
-        const page = response.body ?? [];
-        const total = this.parseTotalCount(response);
+          this.mobileTasks.update((existing) =>
+            append ? this.mergeUniqueTasks(existing, page) : this.mergeUniqueTasks([], page),
+          );
 
-        this.mobileTasks.update((existing) =>
-          append ? this.mergeUniqueTasks(existing, page) : this.mergeUniqueTasks([], page),
-        );
+          this.mobileOffset.set(offset + page.length);
 
-        this.mobileOffset.set(offset + page.length);
+          if (total !== null) {
+            this.mobileTotalCount.set(total);
+          }
 
-        if (total !== null) {
-          this.mobileTotalCount.set(total);
-        }
+          const knownTotal = total ?? this.mobileTotalCount();
 
-        const knownTotal = total ?? this.mobileTotalCount();
+          this.mobileHasMore.set(
+            knownTotal !== null ? offset + page.length < knownTotal : page.length === this.pageSize,
+          );
 
-        this.mobileHasMore.set(
-          knownTotal !== null ? offset + page.length < knownTotal : page.length === this.pageSize,
-        );
+          this.mobileLoading.set(false);
+          this.mobileLoadingMore.set(false);
+        },
+        error: (error: HttpErrorResponse) => {
+          if (requestVersion !== this.searchVersion) {
+            return;
+          }
+          this.mobileLoading.set(false);
+          this.mobileLoadingMore.set(false);
 
-        this.mobileLoading.set(false);
-        this.mobileLoadingMore.set(false);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.mobileLoading.set(false);
-        this.mobileLoadingMore.set(false);
-
-        this.mobileError.set(
-          error.status === 401
-            ? 'Your session may have expired. Please sign in again.'
-            : error.status === 403
-              ? 'You do not have permission to view these tasks.'
-              : 'Unable to load tasks. Please try again.',
-        );
-      },
-    });
+          this.mobileError.set(
+            error.status === 401
+              ? 'Your session may have expired. Please sign in again.'
+              : error.status === 403
+                ? 'You do not have permission to view these tasks.'
+                : 'Unable to load tasks. Please try again.',
+          );
+        },
+      });
   }
 
   protected openTaskDetails(taskId: string): void {
@@ -415,7 +493,7 @@ export class ProjectTasks implements OnInit {
       return null;
     }
 
-    const match = contentRange.trim().match(/^\d+-\d+\/(\d+|\*)$/);
+    const match = contentRange.trim().match(/^(?:\d+-\d+|\*)\/(\d+|\*)$/);
 
     if (!match || match[1] === '*') {
       return null;

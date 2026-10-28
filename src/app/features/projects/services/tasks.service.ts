@@ -44,17 +44,25 @@ export class TasksService {
     limit: number,
     offset: number,
     status?: TaskStatus,
+    searchTerm = '',
   ): Observable<HttpResponse<Task[]>> {
     let params = new HttpParams()
       .set('project_id', `eq.${projectId}`)
       .set('limit', limit)
-      .set('offset', offset);
+      .set('offset', offset)
+      .set('order', 'created_at.desc');
+
+    const normalizedSearch = searchTerm.trim();
+
+    if (normalizedSearch) {
+      params = params.set('title', `ilike.%${normalizedSearch}%`);
+    }
 
     if (status) {
       params = params.set('status', `eq.${status}`);
     }
 
-    return this.http.get<Task[]>(this.projectTasksEndpoint, {
+    return this.http.get<Task[]>(`${environment.apiUrl}/rest/v1/project_tasks`, {
       params,
       observe: 'response',
     });
