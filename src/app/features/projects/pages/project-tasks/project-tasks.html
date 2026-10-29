@@ -144,13 +144,30 @@
     } }
   </main>
 
+  @if (taskMoveError()) {
+  <div
+    class="mx-4 mt-3 flex items-center justify-between gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 md:mx-8"
+    role="alert"
+  >
+    <span>{{ taskMoveError() }}</span>
+
+    <button
+      type="button"
+      (click)="clearTaskMoveError()"
+      class="shrink-0 rounded px-2 py-1 font-semibold hover:bg-red-100"
+      aria-label="Dismiss error message"
+    >
+      Dismiss
+    </button>
+  </div>
+  }
   <!-- ====================================================== -->
   <!-- DESKTOP: horizontal board with independent scrolling   -->
   <!-- ====================================================== -->
   <main
     class="mt-6 hidden min-h-0 flex-1 overflow-x-auto overflow-y-hidden px-4 pb-4 md:block md:px-8"
   >
-    <div class="flex h-full min-w-0 items-stretch gap-4 md:gap-6">
+    <div cdkDropListGroup class="flex h-full min-w-0 items-stretch gap-4 md:gap-6">
       @for (column of columns(); track column.status) {
       <section
         class="flex h-full min-h-0 w-[286px] shrink-0 flex-col"
@@ -191,6 +208,10 @@
 
         <!-- Column content and infinite scroll -->
         <div
+          cdkDropList
+          [cdkDropListData]="column.tasks"
+          [id]="'task-column-' + column.status"
+          (cdkDropListDropped)="onTaskDropped($event, column.status)"
           class="relative min-h-0 flex-1 overflow-y-auto rounded-lg border border-dashed border-[#E1E6F2]"
           (scroll)="onColumnScroll($event, column.status)"
         >
@@ -259,7 +280,13 @@
           @else {
           <div class="flex flex-col gap-3 p-3">
             @for (task of column.tasks; track task.id) {
-            <app-task-card [task]="task" [showStatus]="false" (click)="openTaskDetails(task.id)" />
+            <app-task-card
+              cdkDrag
+              [cdkDragData]="task"
+              [task]="task"
+              [showStatus]="false"
+              (click)="openTaskDetails(task.id)"
+            />
             }
           </div>
           }

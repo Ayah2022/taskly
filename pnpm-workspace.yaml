@@ -3,3 +3,5 @@ allowBuilds:
   esbuild: false
   lmdb: false
   msgpackr-extract: false
+minimumReleaseAgeExclude:
+  - '@angular/cdk@22.2.5'

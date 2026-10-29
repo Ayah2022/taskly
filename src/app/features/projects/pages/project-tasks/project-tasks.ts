@@ -6,6 +6,8 @@ import { TasksService } from '../../services/tasks.service';
 import { Task, TaskStatus } from '../../models/task.model';
 import { AddTaskModal } from '../../../../shared/components/add-task-modal/add-task-modal';
 
+import { CdkDrag, CdkDropList, CdkDropListGroup, CdkDragDrop } from '@angular/cdk/drag-drop';
+
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TaskCardComponent } from '../../../../shared/components/task-card/task-card';
@@ -30,13 +32,20 @@ interface BoardColumn {
 @Component({
   selector: 'app-project-tasks',
   standalone: true,
-  imports: [AddTaskModal, TaskCardComponent, TaskDetailsModal],
+  imports: [
+    AddTaskModal,
+    TaskCardComponent,
+    TaskDetailsModal,
+    CdkDrag,
+    CdkDropList,
+    CdkDropListGroup,
+  ],
   templateUrl: './project-tasks.html',
 })
 export class ProjectTasks implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly tasksService = inject(TasksService);
-
+  readonly taskMoveError = signal<string | null>(null);
   readonly projectId = signal<string | null>(null);
   readonly addTaskOpen = signal(false);
   readonly selectedStatus = signal<TaskStatus>('TO_DO');
@@ -502,5 +511,109 @@ export class ProjectTasks implements OnInit {
     const total = Number(match[1]);
 
     return Number.isSafeInteger(total) && total >= 0 ? total : null;
+  }
+
+  onTaskDropped(event: CdkDragDrop<Task[]>, destinationStatus: TaskStatus): void {
+    const task = event.item.data as Task;
+
+    // Find the column that currently contains this task.
+    const sourceColumn = this.columns().find((column) =>
+      column.tasks.some((item) => item.id === task.id),
+    );
+
+    const targetColumn = this.columns().find((column) => column.status === destinationStatus);
+
+    if (!sourceColumn || !targetColumn) {
+      return;
+    }
+
+    // Dropping into the same column must not call the API.
+    if (sourceColumn.status === destinationStatus) {
+      return;
+    }
+
+    const sourceStatus = sourceColumn.status;
+    const originalIndex = sourceColumn.tasks.findIndex((item) => item.id === task.id);
+
+    this.taskMoveError.set(null);
+
+    // Optimistically move the card in the UI.
+    this.columns.update((columns) =>
+      columns.map((column) => {
+        if (column.status === sourceStatus) {
+          return {
+            ...column,
+            tasks: column.tasks.filter((item) => item.id !== task.id),
+            totalCount: column.totalCount === null ? null : Math.max(0, column.totalCount - 1),
+          };
+        }
+
+        if (column.status === destinationStatus) {
+          return {
+            ...column,
+            tasks: [{ ...task, status: destinationStatus }, ...column.tasks],
+            totalCount: column.totalCount === null ? null : column.totalCount + 1,
+          };
+        }
+
+        return column;
+      }),
+    );
+
+    // Persist the status change in Supabase.
+    this.tasksService.updateTaskStatus(task.id, destinationStatus).subscribe({
+      next: () => {
+        // The optimistic UI already reflects the saved status.
+      },
+
+      error: (error: unknown) => {
+        // Roll the card back to its original column and position.
+        this.columns.update((columns) =>
+          columns.map((column) => {
+            if (column.status === destinationStatus) {
+              return {
+                ...column,
+                tasks: column.tasks.filter((item) => item.id !== task.id),
+                totalCount: column.totalCount === null ? null : Math.max(0, column.totalCount - 1),
+              };
+            }
+
+            if (column.status === sourceStatus) {
+              const restoredTasks = [...column.tasks];
+
+              restoredTasks.splice(Math.min(originalIndex, restoredTasks.length), 0, task);
+
+              return {
+                ...column,
+                tasks: restoredTasks,
+                totalCount: column.totalCount === null ? null : column.totalCount + 1,
+              };
+            }
+
+            return column;
+          }),
+        );
+
+        this.taskMoveError.set(this.getTaskMoveErrorMessage(error));
+      },
+    });
+  }
+
+  private getTaskMoveErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 401) {
+        return 'Your session may have expired. Please sign in again.';
+      }
+
+      if (error.status === 403) {
+        return 'You do not have permission to update this task.';
+      }
+    }
+
+    return 'Unable to move the task. Its original status has been restored.';
+  }
+
+  clearTaskMoveError(): void {
+    this.taskMoveError.set(null);
   }
 }

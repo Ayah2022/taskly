@@ -62,7 +62,7 @@ export class TasksService {
       params = params.set('status', `eq.${status}`);
     }
 
-    return this.http.get<Task[]>(`${environment.apiUrl}/rest/v1/project_tasks`, {
+    return this.http.get<Task[]>(this.projectTasksEndpoint, {
       params,
       observe: 'response',
     });
@@ -76,5 +76,26 @@ export class TasksService {
     return this.http.get<Task[]>(this.projectTasksEndpoint, {
       params,
     });
+  }
+
+  /**
+   * Updates a task's status in the database.
+   * Authentication and Supabase API headers are provided by the interceptor.
+   *
+   * Uses the task's database UUID, not its human-readable task_id.
+   */
+  updateTaskStatus(taskId: string, status: TaskStatus): Observable<void> {
+    const params = new HttpParams().set('id', `eq.${taskId}`);
+
+    return this.http.patch<void>(
+      this.endpoint,
+      { status },
+      {
+        params,
+        headers: {
+          Prefer: 'return=minimal',
+        },
+      },
+    );
   }
 }
